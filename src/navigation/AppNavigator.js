@@ -52,10 +52,10 @@ const AppNavigator = ({ navigation }) => {
               }}
               resizeMode="contain"
             />
-            <View>
-              <Text style={{ fontWeight: 'bold', fontSize: 20 }}>           PARMARTH</Text>
-              <Text style={{ fontSize: 14, color: '#555' }}>The Social Club of IET Lucknow</Text>
-            </View>
+            {/* <View>
+              <Text style={{ fontWeight: 'bold', fontSize: 18 }}>           PARMARTH</Text>
+              <Text style={{ fontSize: 12, color: '#555' }}>The Social Club of IET Lucknow</Text>
+            </View> */}
           </View>
         ),
 
