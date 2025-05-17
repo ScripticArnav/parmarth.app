@@ -1,214 +1,4 @@
-// import React, { useRef, useState, useEffect } from 'react';
-// import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Dimensions, FlatList } from 'react-native';
-// import { Video } from 'expo-av';
-// import { Feather } from '@expo/vector-icons';
-
-// const screenWidth = Dimensions.get('window').width;
-
-// const Counter = ({ end, duration = 2000 }) => {
-//   const [count, setCount] = useState(0);
-
-//   useEffect(() => {
-//     let start = 0;
-//     const increment = end / (duration / 16);
-//     const timer = setInterval(() => {
-//       start += increment;
-//       if (start >= end) {
-//         setCount(end);
-//         clearInterval(timer);
-//       } else {
-//         setCount(Math.ceil(start));
-//       }
-//     }, 16);
-
-//     return () => clearInterval(timer);
-//   }, [end, duration]);
-
-//   return <Text style={styles.statNumber}>{count}+</Text>;
-// };
-
-// const HomeScreen = () => {
-//   const videoRef = useRef(null);
-//   const [muted, setMuted] = useState(true);
-
-//   const toggleMute = () => {
-//     if (videoRef.current) {
-//       videoRef.current.setIsMutedAsync(!muted);
-//       setMuted(!muted);
-//       videoRef.current.playAsync();
-//     }
-//   };
-
-//   const impactData = [
-//     { title: 'SLUM AREAS', count: 6, description: 'Contribute through financial\nsupport and volunteer engagement.' },
-//     { title: 'STUDENTS', count: 200, description: 'Hundreds of students\nare studying in our club.' },
-//     { title: 'Families', count: 300, description: 'Providing warm clothes to\nunderprivileged families annually' },
-//     { title: 'RTE ADMISSION', count: 400, description: 'Students of parmarth have got\nadmission in various private schools' },
-//   ];
-
-//   return (
-//     <ScrollView style={styles.container}>
-//       <View style={styles.header}>
-//         <Text style={styles.parmarth}>परमार्थ<Text style={{ color: '#277bc0' }}>.</Text></Text>
-//         <Text style={styles.subTitle}>The Social Club of IET Lucknow</Text>
-//       </View>
-
-//       <View style={styles.aboutSection}>
-//         <Text style={styles.title}>Parmarth</Text>
-//         <Text style={styles.subText}>Since 2015</Text>
-//         <Text style={styles.highlight}>
-//           Kind words can be short and easy to speak, but their echoes are truly endless.
-//         </Text>
-//         <Text style={styles.aboutText}>
-//           Small group of thoughtful people can change the world... (trimmed for brevity)
-//         </Text>
-//         <View style={styles.videoContainer}>
-//           <Video
-//             ref={videoRef}
-//             source={require('../../assets/intro.mp4')}
-//             rate={1.0}
-//             volume={1.0}
-//             isMuted={muted}
-//             resizeMode="cover"
-//             shouldPlay
-//             isLooping
-//             style={styles.video}
-//           />
-//           <TouchableOpacity style={styles.unmuteButton} onPress={toggleMute}>
-//             {muted ? (
-//               <Feather name="volume-x" size={24} color="#fff" />
-//             ) : (
-//               <Feather name="volume-2" size={24} color="#fff" />
-//             )}
-//           </TouchableOpacity>
-//         </View>
-//       </View>
-
-//       <View style={styles.statsSection}>
-//         <Text style={styles.statsTitle}>Our Impact</Text>
-//         <FlatList
-//           data={impactData}
-//           horizontal
-//           showsHorizontalScrollIndicator={false}
-//           keyExtractor={(item) => item.title}
-//           contentContainerStyle={styles.statsContainer}
-//           renderItem={({ item }) => (
-//             <View style={styles.statCard}>
-//               <Counter end={item.count} />
-//               <Text style={styles.statTitle}>{item.title}</Text>
-//               <Text style={styles.statDescription}>{item.description}</Text>
-//             </View>
-//           )}
-//         />
-//       </View>
-//     </ScrollView>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//   },
-//   header: {
-//     alignItems: 'center',
-//     paddingTop: 80,
-//     paddingBottom: 40,
-//     backgroundColor: '#277bc0',
-//   },
-//   parmarth: {
-//     fontSize: 36,
-//     fontWeight: 'bold',
-//     color: '#fff',
-//   },
-//   subTitle: {
-//     fontSize: 16,
-//     color: '#fff',
-//   },
-//   aboutSection: {
-//     padding: 20,
-//   },
-//   title: {
-//     fontSize: 28,
-//     fontWeight: '600',
-//   },
-//   subText: {
-//     fontSize: 14,
-//     color: '#888',
-//   },
-//   highlight: {
-//     marginTop: 10,
-//     fontSize: 16,
-//     color: '#277bc0',
-//     fontWeight: '500',
-//   },
-//   aboutText: {
-//     marginTop: 10,
-//     fontSize: 14,
-//     color: '#444',
-//   },
-//   videoContainer: {
-//     marginTop: 20,
-//     position: 'relative',
-//     borderRadius: 10,
-//     overflow: 'hidden',
-//   },
-//   video: {
-//     width: '100%',
-//     height: 200,
-//   },
-//   unmuteButton: {
-//     position: 'absolute',
-//     right: 10,
-//     bottom: 10,
-//     backgroundColor: 'rgba(0,0,0,0.5)',
-//     borderRadius: 20,
-//     padding: 8,
-//   },
-//   statsSection: {
-//     padding: 20,
-//     backgroundColor: '#f7f7f7',
-//   },
-//   statsTitle: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     marginBottom: 10,
-//   },
-//   statsContainer: {
-//     flexDirection: 'row',
-//   },
-//   statCard: {
-//     width: screenWidth * 0.7,
-//     padding: 16,
-//     marginRight: 12,
-//     backgroundColor: '#fff',
-//     borderRadius: 12,
-//     elevation: 3,
-//     shadowColor: '#000',
-//     shadowOpacity: 0.1,
-//     shadowOffset: { width: 0, height: 2 },
-//     shadowRadius: 4,
-//   },
-//   statNumber: {
-//     fontSize: 32,
-//     fontWeight: 'bold',
-//     color: '#277bc0',
-//   },
-//   statTitle: {
-//     fontSize: 16,
-//     fontWeight: '600',
-//     marginTop: 8,
-//   },
-//   statDescription: {
-//     marginTop: 4,
-//     color: '#555',
-//     fontSize: 13,
-//   },
-// });
-
-// export default HomeScreen;
-
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -216,14 +6,9 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
-  FlatList,
 } from "react-native";
-import { Image } from 'react-native';
-import {
-  Feather,
-  FontAwesome5,
-  MaterialCommunityIcons,
-} from "@expo/vector-icons";
+import { Image } from "react-native";
+import { Feather, FontAwesome5 } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
@@ -280,15 +65,15 @@ const HomeScreen = () => {
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-  <Image
-    source={require('../../assets/icon.png')}  // Correct path depending on your file structure
-    style={styles.logo}
-    resizeMode="contain"
-  />
-  <Text style={styles.title}>PARMARTH</Text>
-  <Text style={styles.subtitle}>The Social Club of IET Lucknow</Text>
-</View>
+      {/* <View style={styles.header}>
+        <Image
+          source={require("../../assets/icon.png")} // Correct path depending on your file structure
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>PARMARTH</Text>
+        <Text style={styles.subtitle}>The Social Club of IET Lucknow</Text>
+      </View> */}
 
       {/* Blood Donation Box */}
       <View style={styles.bannerBox}>
@@ -303,9 +88,9 @@ const HomeScreen = () => {
           <Text>Events</Text>
         </View>
         <View style={styles.menuItem}>
-  <FontAwesome5 name="handshake" size={24} color="#002855" />
-  <Text>Volunteer Now</Text>
-</View>
+          <FontAwesome5 name="handshake" size={24} color="#002855" />
+          <Text>Volunteer Now</Text>
+        </View>
 
         <View style={styles.menuItem}>
           <Feather name="image" size={24} color="#002855" />
@@ -368,7 +153,14 @@ const HomeScreen = () => {
                     </Text>
                   </View>
                 ))}
-                {row.length === 1 && <View style={[styles.statCard, { backgroundColor: 'transparent' }]} />}
+                {row.length === 1 && (
+                  <View
+                    style={[
+                      styles.statCard,
+                      { backgroundColor: "transparent" },
+                    ]}
+                  />
+                )}
 
                 {/* Empty space filler if odd number */}
               </View>
@@ -476,11 +268,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   logo: {
-  width: 50,
-  height: 50,
-  marginBottom: 8,
-},
-
+    width: 50,
+    height: 50,
+    marginBottom: 8,
+  },
 });
 
 export default HomeScreen;
