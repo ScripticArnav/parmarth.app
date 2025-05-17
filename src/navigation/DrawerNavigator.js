@@ -1,0 +1,170 @@
+import React, { memo, useContext } from "react";
+import {
+  createDrawerNavigator,
+  DrawerContentScrollView,
+  DrawerItemList,
+} from "@react-navigation/drawer";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  interpolate,
+} from "react-native-reanimated";
+
+import AppNavigator from "./AppNavigator";
+import AttendanceScreen from '../screens/AttendanceScreen';
+import EventsScreen from '../screens/EventsScreen';
+import AboutScreen from '../screens/AboutScreen';
+import AuthContext from "../store/AuthContext"; // Path check kar lena
+
+const MemoizedTabs = memo(AppNavigator);
+const Drawer = createDrawerNavigator();
+
+const CustomDrawerContent = (props) => {
+  const authCtx = useContext(AuthContext);
+
+  const handleAuthPress = () => {
+    if (authCtx.isLoggedIn) {
+      authCtx.logout();
+    } else {
+      // Drawer ke nested Tab me "Profile" tab open karna hai
+      props.navigation.navigate("Main", { screen: "Profile" });
+    }
+  };
+
+  return (
+    <DrawerContentScrollView {...props} contentContainerStyle={{ flex: 1 }}>
+      <BlurView intensity={60} style={styles.blurBackground}>
+        <View style={styles.profileSection}>
+          <Image
+            source={require("../../assets/profile.jpg")}
+            style={styles.profilePic}
+          />
+          <Text style={styles.username}>Parmarth User</Text>
+        </View>
+
+        <DrawerItemList {...props} />
+
+        <View style={styles.authButtonContainer}>
+          <TouchableOpacity onPress={handleAuthPress} style={styles.authButton}>
+            <Ionicons
+              name={authCtx.isLoggedIn ? "log-out-outline" : "log-in-outline"}
+              size={20}
+              color="#000"
+              style={{ marginRight: 8 }}
+            />
+            <Text style={styles.authButtonText}>
+              {authCtx.isLoggedIn ? "Logout" : "Login"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </BlurView>
+    </DrawerContentScrollView>
+  );
+};
+
+export default function DrawerNavigator() {
+  const progress = useSharedValue(0);
+
+  const animatedScreenStyle = useAnimatedStyle(() => ({
+    transform: [
+      { scale: interpolate(progress.value, [0, 1], [1, 0.88]) },
+      { translateX: interpolate(progress.value, [0, 1], [0, 50]) },
+    ],
+    borderRadius: interpolate(progress.value, [0, 1], [0, 20]),
+    overflow: "hidden",
+    flex: 1,
+  }));
+
+  return (
+    <Drawer.Navigator
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      screenOptions={{
+        drawerType: "slide",
+        overlayColor: "transparent",
+        drawerStyle: styles.drawerStyle,
+        sceneContainerStyle: { backgroundColor: "transparent" },
+        headerShown: false,
+      }}
+    >
+      <Drawer.Screen name="Main">
+        {(props) => (
+          <Animated.View style={animatedScreenStyle}>
+            <MemoizedTabs {...props} />
+          </Animated.View>
+        )}
+      </Drawer.Screen>
+
+      <Drawer.Screen
+        name="Attendance"
+        component={AttendanceScreen}
+        options={{ headerShown: true }}
+      />
+      <Drawer.Screen
+        name="Events"
+        component={EventsScreen}
+        options={{ headerShown: true }}
+      />
+      <Drawer.Screen
+        name="About"
+        component={AboutScreen}
+        options={{ headerShown: true }}
+      />
+       </Drawer.Navigator>
+  );
+}
+
+const styles = StyleSheet.create({
+  blurBackground: {
+    flex: 1,
+    padding: 20,
+  },
+  profileSection: {
+    alignItems: "center",
+    marginBottom: 30,
+  },
+  profilePic: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 10,
+  },
+  username: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  drawerStyle: {
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    width: 260,
+    borderTopRightRadius: 20,
+    borderBottomRightRadius: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: -2, height: 0 },
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  authButtonContainer: {
+    marginTop: "auto",
+    paddingVertical: 20,
+    borderTopWidth: 1,
+    borderColor: "#ccc",
+  },
+  authButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+  },
+  authButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+});
