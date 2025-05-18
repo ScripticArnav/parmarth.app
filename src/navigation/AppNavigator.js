@@ -7,10 +7,13 @@ import { TouchableOpacity, View, Image } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import StudyMaterialScreen from '../screens/StudyMaterialScreen';
 import MaterialDetailsScreen from '../screens/MaterialDetailsScreen';
-import DatabaseScreen from '../screens/DatabaseScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import LoginScreen from '../screens/LoginScreen';
+
 import ProfileScreen from '../screens/ProfileScreen';
 import LoginScreen from '../screens/LoginScreen';
 import ViewAttendanceScreen from '../screens/ViewAttendanceScreen';
+
 
 import AuthContext from '../store/AuthContext';
 
@@ -18,16 +21,36 @@ const StudyStack = createStackNavigator();
 
 function StudyMaterialStack() {
   return (
-    <StudyStack.Navigator>
+    <StudyStack.Navigator screenOptions={{
+    headerRight: () => (
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 16 }}>
+        <Image
+          source={require('../../assets/logo.jpg')}
+          style={{
+            width: 50,
+            height: 50,
+            marginRight: 10,
+            borderWidth: 0.8,
+            borderRadius: 18,
+          }}
+          resizeMode="contain"
+        />
+      </View>
+    ),
+  }}
+>
       <StudyStack.Screen
-        name="StudyMaterialMain"
+        name="Study Material"
         component={StudyMaterialScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: true }}  // Study Material screen pe header na dikhe
       />
       <StudyStack.Screen
         name="MaterialDetails"
         component={MaterialDetailsScreen}
-        options={({ route }) => ({ title: `${route.params.class} Material` })}
+        options={({ route }) => ({
+          title: `${route.params.class} Material`,
+          headerShown: true,  // Sirf yaha header dikhana hai
+        })}
       />
     </StudyStack.Navigator>
   );
@@ -60,6 +83,7 @@ const AppNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route, navigation }) => ({
+        
         headerLeft: () => (
           <TouchableOpacity
             onPress={() => {
@@ -81,7 +105,7 @@ const AppNavigator = () => {
         headerRight: () => (
           <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 16 }}>
             <Image
-              source={require('../../assets/icon.png')}
+              source={require('../../assets/logo.jpg')}
               style={{
                 width: 50,
                 height: 50,
@@ -94,12 +118,11 @@ const AppNavigator = () => {
             />
           </View>
         ),
-
         tabBarIcon: ({ color, size }) => {
+          
           let iconName;
           if (route.name === 'Home') iconName = 'home-outline';
           else if (route.name === 'StudyMaterial') iconName = 'book-outline';
-          else if (route.name === 'Organization') iconName = 'people-outline';
           else if (route.name === 'Database') iconName = 'folder-outline';
           else if (route.name === 'Profile') iconName = 'person-outline';
 
@@ -107,7 +130,12 @@ const AppNavigator = () => {
         },
 
 
+        
+        headerShown: route.name !== 'StudyMaterial',
+
+
         headerShown: route.name !== 'Database',
+
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
