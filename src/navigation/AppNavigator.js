@@ -7,15 +7,10 @@ import { TouchableOpacity, View, Image } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import StudyMaterialScreen from '../screens/StudyMaterialScreen';
 import MaterialDetailsScreen from '../screens/MaterialDetailsScreen';
-import OrganizationScreen from '../screens/OrganizationScreen';
-import DatabaseScreen from '../screens/DatabaseScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import LoginScreen from '../screens/LoginScreen';
 
-import GoverningCouncilScreen from '../screens/GoverningCouncilScreen';
-import AdvisoryCouncilScreen from '../screens/AdvisoryCouncilScreen';
-import ExecutiveCouncilScreen from '../screens/ExecutiveCouncilScreen';
-import LegacyCouncilScreen from '../screens/LegacyCouncilScreen';
+
 
 import AuthContext from '../store/AuthContext';
 
@@ -23,57 +18,45 @@ const StudyStack = createStackNavigator();
 
 function StudyMaterialStack() {
   return (
-    <StudyStack.Navigator>
+    <StudyStack.Navigator screenOptions={{
+    headerRight: () => (
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 16 }}>
+        <Image
+          source={require('../../assets/logo.jpg')}
+          style={{
+            width: 50,
+            height: 50,
+            marginRight: 10,
+            borderWidth: 0.8,
+            borderRadius: 18,
+          }}
+          resizeMode="contain"
+        />
+      </View>
+    ),
+  }}
+>
       <StudyStack.Screen
-        name="StudyMaterialMain"
+        name="Study Material"
         component={StudyMaterialScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: true }}  // Study Material screen pe header na dikhe
       />
       <StudyStack.Screen
         name="MaterialDetails"
         component={MaterialDetailsScreen}
-        options={({ route }) => ({ title: `${route.params.class} Material` })}
+        options={({ route }) => ({
+          title: `${route.params.class} Material`,
+          headerShown: true,  // Sirf yaha header dikhana hai
+        })}
       />
     </StudyStack.Navigator>
   );
 }
 
+
 import DatabaseStack from './DatabaseStack.js';
 
 const Tab = createBottomTabNavigator();
-const OrgStack = createStackNavigator();
-
-function OrganizationStack() {
-  return (
-    <OrgStack.Navigator >
-      <OrgStack.Screen
-        name="OrganizationMain"
-        component={OrganizationScreen}
-        options={{ title: 'Organization' }}
-      />
-      <OrgStack.Screen
-        name="GoverningCouncil"
-        component={GoverningCouncilScreen}
-        options={{ title: 'Governing Council' }}
-      />
-      <OrgStack.Screen
-        name="AdvisoryCouncil"
-        component={AdvisoryCouncilScreen}
-        options={{ title: 'Advisory Council' }}
-      />
-      <OrgStack.Screen
-        name="ExecutiveCouncil"
-        component={ExecutiveCouncilScreen}
-        options={{ title: 'Executive Council' }}
-      />
-      <OrgStack.Screen
-        name="LegacyCouncil"
-        component={LegacyCouncilScreen}
-        options={{ title: 'Legacy Executive Council' }}
-      />
-    </OrgStack.Navigator>
-  );
-}
 
 const AppNavigator = () => {
   const authCtx = useContext(AuthContext);
@@ -82,6 +65,7 @@ const AppNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route, navigation }) => ({
+        
         headerLeft: () => (
           <TouchableOpacity
             onPress={() => {
@@ -103,7 +87,7 @@ const AppNavigator = () => {
         headerRight: () => (
           <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 16 }}>
             <Image
-              source={require('../../assets/icon.png')}
+              source={require('../../assets/logo.jpg')}
               style={{
                 width: 50,
                 height: 50,
@@ -116,25 +100,23 @@ const AppNavigator = () => {
             />
           </View>
         ),
-
         tabBarIcon: ({ color, size }) => {
+          
           let iconName;
           if (route.name === 'Home') iconName = 'home-outline';
           else if (route.name === 'StudyMaterial') iconName = 'book-outline';
-          else if (route.name === 'Organization') iconName = 'people-outline';
           else if (route.name === 'Database') iconName = 'folder-outline';
           else if (route.name === 'Profile') iconName = 'person-outline';
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
 
-
-        headerShown: route.name !== 'Organization',
+        
+        headerShown: route.name !== 'StudyMaterial',
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="StudyMaterial" component={StudyMaterialStack} />
-      <Tab.Screen name="Organization" component={OrganizationStack} />
       <Tab.Screen name="Database" component={DatabaseStack} />
       <Tab.Screen
         key={isAuth ? 'auth' : 'guest'}
