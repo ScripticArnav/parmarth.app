@@ -135,7 +135,6 @@ const AppNavigator = () => {
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="StudyMaterial" component={StudyMaterialStack} />
       <Tab.Screen name="Organization" component={OrganizationStack} />
-      <Tab.Screen name="Database" component={DatabaseScreen} />
       <Tab.Screen name="Database" component={DatabaseStack} />
       <Tab.Screen
         key={isAuth ? 'auth' : 'guest'}
