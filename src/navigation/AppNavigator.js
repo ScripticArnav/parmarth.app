@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,15 +7,10 @@ import { TouchableOpacity, View, Image } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import StudyMaterialScreen from '../screens/StudyMaterialScreen';
 import MaterialDetailsScreen from '../screens/MaterialDetailsScreen';
-import OrganizationScreen from '../screens/OrganizationScreen';
 import DatabaseScreen from '../screens/DatabaseScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import LoginScreen from '../screens/LoginScreen';
-
-import GoverningCouncilScreen from '../screens/GoverningCouncilScreen';
-import AdvisoryCouncilScreen from '../screens/AdvisoryCouncilScreen';
-import ExecutiveCouncilScreen from '../screens/ExecutiveCouncilScreen';
-import LegacyCouncilScreen from '../screens/LegacyCouncilScreen';
+import ViewAttendanceScreen from '../screens/ViewAttendanceScreen';
 
 import AuthContext from '../store/AuthContext';
 
@@ -38,40 +33,23 @@ function StudyMaterialStack() {
   );
 }
 
-import DatabaseStack from './DatabaseStack.js';
-
 const Tab = createBottomTabNavigator();
-const OrgStack = createStackNavigator();
 
-function OrganizationStack() {
+const DbStack = createStackNavigator();
+
+function DatabaseStack() {
   return (
-    <OrgStack.Navigator >
-      <OrgStack.Screen
-        name="OrganizationMain"
-        component={OrganizationScreen}
-        options={{ title: 'Organization' }}
+    <DbStack.Navigator >
+      <DbStack.Screen
+        name="DatabaseHome" 
+        component={DatabaseScreen}
+        options={{ headerShown: true }}
       />
-      <OrgStack.Screen
-        name="GoverningCouncil"
-        component={GoverningCouncilScreen}
-        options={{ title: 'Governing Council' }}
+      <DbStack.Screen
+        name="ViewAttendanceScreen" component={ViewAttendanceScreen}
+        options={{ headerShown: true }}
       />
-      <OrgStack.Screen
-        name="AdvisoryCouncil"
-        component={AdvisoryCouncilScreen}
-        options={{ title: 'Advisory Council' }}
-      />
-      <OrgStack.Screen
-        name="ExecutiveCouncil"
-        component={ExecutiveCouncilScreen}
-        options={{ title: 'Executive Council' }}
-      />
-      <OrgStack.Screen
-        name="LegacyCouncil"
-        component={LegacyCouncilScreen}
-        options={{ title: 'Legacy Executive Council' }}
-      />
-    </OrgStack.Navigator>
+    </DbStack.Navigator>
   );
 }
 
@@ -129,12 +107,11 @@ const AppNavigator = () => {
         },
 
 
-        headerShown: route.name !== 'Organization',
+        headerShown: route.name !== 'Database',
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="StudyMaterial" component={StudyMaterialStack} />
-      <Tab.Screen name="Organization" component={OrganizationStack} />
       <Tab.Screen name="Database" component={DatabaseStack} />
       <Tab.Screen
         key={isAuth ? 'auth' : 'guest'}
