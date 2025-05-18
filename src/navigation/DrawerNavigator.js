@@ -4,13 +4,7 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import Animated, {
@@ -20,9 +14,9 @@ import Animated, {
 } from "react-native-reanimated";
 
 import AppNavigator from "./AppNavigator";
-import AttendanceScreen from '../screens/AttendanceScreen';
-import EventsScreen from '../screens/EventsScreen';
-import AboutScreen from '../screens/AboutScreen';
+import AttendanceScreen from "../screens/AttendanceScreen";
+import EventsScreen from "../screens/EventsScreen";
+import AboutScreen from "../screens/AboutScreen";
 import AuthContext from "../store/AuthContext"; // Path check kar lena
 
 const MemoizedTabs = memo(AppNavigator);
@@ -93,6 +87,32 @@ export default function DrawerNavigator() {
         drawerStyle: styles.drawerStyle,
         sceneContainerStyle: { backgroundColor: "transparent" },
         headerShown: false,
+        headerRight: () => (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginRight: 16,
+            }}
+          >
+            <Image
+              source={require("../../assets/icon.png")}
+              style={{
+                width: 50,
+                height: 50,
+                marginRight: 10,
+                borderColor: "black",
+                borderWidth: 0.8,
+                borderRadius: 18,
+              }}
+              resizeMode="contain"
+            />
+            {/* <View>
+                      <Text style={{ fontWeight: 'bold', fontSize: 18 }}>           PARMARTH</Text>
+                      <Text style={{ fontSize: 12, color: '#555' }}>The Social Club of IET Lucknow</Text>
+                    </View> */}
+          </View>
+        ),
       }}
     >
       <Drawer.Screen name="Main">
@@ -118,7 +138,7 @@ export default function DrawerNavigator() {
         component={AboutScreen}
         options={{ headerShown: true }}
       />
-       </Drawer.Navigator>
+    </Drawer.Navigator>
   );
 }
 
