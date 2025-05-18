@@ -1,25 +1,89 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
-import { TouchableOpacity, View, Text, Image } from 'react-native';
+import { TouchableOpacity, View, Image } from 'react-native';
+
+import HomeScreen from '../screens/HomeScreen';
+import StudyMaterialScreen from '../screens/StudyMaterialScreen';
+import MaterialDetailsScreen from '../screens/MaterialDetailsScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import LoginScreen from '../screens/LoginScreen';
+
+import ProfileScreen from '../screens/ProfileScreen';
+import LoginScreen from '../screens/LoginScreen';
+import ViewAttendanceScreen from '../screens/ViewAttendanceScreen';
 
 
-import HomeScreen from '../screens/HomeScreen.js';
-import EventScreen from '../screens/EventScreen.js';
-import DatabaseScreen from '../screens/DatabaseScreen.js';
-import ProfileScreen from '../screens/ProfileScreen.js';
-import AuthContext from '../store/AuthContext.js';
-import LoginScreen from '../screens/LoginScreen.js';
+import AuthContext from '../store/AuthContext';
+
+const StudyStack = createStackNavigator();
+
+function StudyMaterialStack() {
+  return (
+    <StudyStack.Navigator screenOptions={{
+    headerRight: () => (
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 16 }}>
+        <Image
+          source={require('../../assets/logo.jpg')}
+          style={{
+            width: 50,
+            height: 50,
+            marginRight: 10,
+            borderWidth: 0.8,
+            borderRadius: 18,
+          }}
+          resizeMode="contain"
+        />
+      </View>
+    ),
+  }}
+>
+      <StudyStack.Screen
+        name="Study Material"
+        component={StudyMaterialScreen}
+        options={{ headerShown: true }}  // Study Material screen pe header na dikhe
+      />
+      <StudyStack.Screen
+        name="MaterialDetails"
+        component={MaterialDetailsScreen}
+        options={({ route }) => ({
+          title: `${route.params.class} Material`,
+          headerShown: true,  // Sirf yaha header dikhana hai
+        })}
+      />
+    </StudyStack.Navigator>
+  );
+}
 
 const Tab = createBottomTabNavigator();
 
-const AppNavigator = ({ navigation }) => {
+const DbStack = createStackNavigator();
+
+function DatabaseStack() {
+  return (
+    <DbStack.Navigator >
+      <DbStack.Screen
+        name="DatabaseHome" 
+        component={DatabaseScreen}
+        options={{ headerShown: true }}
+      />
+      <DbStack.Screen
+        name="ViewAttendanceScreen" component={ViewAttendanceScreen}
+        options={{ headerShown: true }}
+      />
+    </DbStack.Navigator>
+  );
+}
+
+const AppNavigator = () => {
   const authCtx = useContext(AuthContext);
   const isAuth = authCtx.isLoggedIn;
 
   return (
     <Tab.Navigator
       screenOptions={({ route, navigation }) => ({
+        
         headerLeft: () => (
           <TouchableOpacity
             onPress={() => {
@@ -38,42 +102,45 @@ const AppNavigator = ({ navigation }) => {
             />
           </TouchableOpacity>
         ),
-
         headerRight: () => (
           <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 16 }}>
             <Image
-              source={require('../../assets/icon.png')}
+              source={require('../../assets/logo.jpg')}
               style={{
-                width: 50, 
-                height: 50, 
-                marginRight: 10, 
-                borderColor: 'black',
-                borderRadius: 106
+                width: 50,
+                height: 50,
+                marginRight: 10,
+                borderWidth: 0.8,
+                borderRadius: 18
+
               }}
               resizeMode="contain"
             />
-            <View>
-              <Text style={{ fontWeight: 'bold', fontSize: 20 }}>           PARMARTH</Text>
-              <Text style={{ fontSize: 14, color: '#555' }}>The Social Club of IET Lucknow</Text>
-            </View>
           </View>
         ),
-
-
         tabBarIcon: ({ color, size }) => {
+          
           let iconName;
           if (route.name === 'Home') iconName = 'home-outline';
-          else if (route.name === 'Event') iconName = 'calendar-outline';
+          else if (route.name === 'StudyMaterial') iconName = 'book-outline';
           else if (route.name === 'Database') iconName = 'folder-outline';
           else if (route.name === 'Profile') iconName = 'person-outline';
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
+
+
+        
+        headerShown: route.name !== 'StudyMaterial',
+
+
+        headerShown: route.name !== 'Database',
+
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Event" component={EventScreen} />
-      <Tab.Screen name="Database" component={DatabaseScreen} />
+      <Tab.Screen name="StudyMaterial" component={StudyMaterialStack} />
+      <Tab.Screen name="Database" component={DatabaseStack} />
       <Tab.Screen
         key={isAuth ? 'auth' : 'guest'}
         name="Profile"

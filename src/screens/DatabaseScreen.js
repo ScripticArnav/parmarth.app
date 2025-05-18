@@ -1,10 +1,33 @@
-import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-export default function DatabaseScreen() {
+const DatabaseScreen = () => {
+  const navigation = useNavigation();
+
+  const handleViewAttendance = () => {
+    navigation.navigate('Database', {
+      screen: 'ViewAttendanceScreen'
+    });
+  };
+
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Database Screen</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Database Screen</Text>
+      <Button title="View Attendance" onPress={handleViewAttendance} />
     </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center'
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 20
+  }
+});
+
+export default DatabaseScreen;
