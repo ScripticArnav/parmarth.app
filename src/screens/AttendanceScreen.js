@@ -1,4 +1,5 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
+import backendUrl from "../../backendUrl";
 import {
   View,
   Text,
@@ -7,6 +8,7 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import AuthContext from "../store/AuthContext";
 
 const AttendanceScreen = () => {
@@ -16,22 +18,144 @@ const AttendanceScreen = () => {
   const [name, setName] = useState("");
   const [rollNo, setRollNo] = useState("");
   const [branch, setBranch] = useState("");
+  const [volName, setVolName] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
 
-  const handleSubmit = () => {
-    if (!rollNo.trim() || !branch.trim()) {
+  const branches = [
+    "CSE",
+    "CSE-SF",
+    "CSE-AI",
+    "Electronics",
+    "Electrical",
+    "Mechanical",
+    "Civil",
+    "Chemical",
+    "MBA",
+    "MCA",
+    "MTech",
+  ];
+
+  const handleSendOtp = async () => {
+    if (!name.trim()) {
+      Alert.alert("Error", "Please enter your email.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${backendUrl}/login/send-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+
+      const data = await response.json();
+      console.log("Response: ", data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to send OTP");
+      }
+
+      setOtpSent(true);
+      Alert.alert("Success", "OTP sent to your email.");
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otp.trim()) {
+      Alert.alert("Error", "Please enter the OTP.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${backendUrl}/login/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, otp }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Invalid OTP");
+      }
+
+      authCtx.login(data.token); // 1-hour token set by backend
+      Alert.alert("Success", "Logged in successfully!");
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!volName.trim() || !rollNo.trim() || !branch.trim()) {
       Alert.alert("Error", "Please fill in all fields.");
       return;
     }
 
-    Alert.alert("Success", "Attendance marked successfully!");
-    setRollNo("");
-    setBranch("");
+    const rollRegex = /^\d{13}$/;
+    if (!rollRegex.test(rollNo)) {
+      Alert.alert("Invalid Roll Number", "Roll Number must be exactly 13 digits.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${backendUrl}/attendance`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authCtx.token}`,
+        },
+        body: JSON.stringify({ volName, rollNo, branch }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Something went wrong!");
+      }
+
+      Alert.alert("Success", data.message || "Attendance marked successfully!");
+      setVolName("");
+      setRollNo("");
+      setBranch("");
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
   };
 
   if (!isLoggedIn) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.loginText}>Please login to mark attendance.</Text>
+      <View style={styles.container}>
+        <Text style={styles.heading}>Volunteer Attendance</Text>
+        <TextInput
+          placeholder="Enter Your Name"
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+          placeholderTextColor="#666"
+        />
+
+        {otpSent ? (
+          <>
+            <TextInput
+              placeholder="Enter OTP"
+              value={otp}
+              onChangeText={setOtp}
+              style={styles.input}
+              placeholderTextColor="#666"
+            />
+            <TouchableOpacity style={styles.button} onPress={handleVerifyOtp}>
+              <Text style={styles.buttonText}>Verify OTP</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleSendOtp}>
+            <Text style={styles.buttonText}>Send OTP</Text>
+          </TouchableOpacity>
+        )}
       </View>
     );
   }
@@ -42,25 +166,35 @@ const AttendanceScreen = () => {
 
       <TextInput
         placeholder="Enter Volunteer Name"
-        value={name}
-        onChangeText={setName}
+        value={volName}
+        onChangeText={setVolName}
         style={styles.input}
         placeholderTextColor="#666"
       />
+
       <TextInput
         placeholder="Enter Roll Number"
         value={rollNo}
-        onChangeText={setRollNo}
+        onChangeText={(text) => {
+          const numericText = text.replace(/[^0-9]/g, "");
+          if (numericText.length <= 13) setRollNo(numericText);
+        }}
         style={styles.input}
         placeholderTextColor="#666"
       />
-      <TextInput
-        placeholder="Enter Branch"
-        value={branch}
-        onChangeText={setBranch}
-        style={styles.input}
-        placeholderTextColor="#666"
-      />
+
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={branch}
+          onValueChange={(itemValue) => setBranch(itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item label="-- Select Branch --" value="" enabled={false} />
+          {branches.map((b) => (
+            <Picker.Item key={b} label={b} value={b} />
+          ))}
+        </Picker>
+      </View>
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Mark Attendance</Text>
@@ -75,12 +209,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 24,
     justifyContent: "center",
-  },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
   },
   heading: {
     fontSize: 22,
@@ -99,6 +227,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     color: "#000",
   },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    marginBottom: 16,
+    overflow: "hidden",
+  },
+  picker: {
+    color: "#000",
+  },
   button: {
     backgroundColor: "#003f88",
     borderRadius: 10,
@@ -110,11 +248,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
-  },
-  loginText: {
-    fontSize: 16,
-    color: "#002855",
-    textAlign: "center",
   },
 });
 

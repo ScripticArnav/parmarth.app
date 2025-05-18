@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +10,9 @@ import MaterialDetailsScreen from '../screens/MaterialDetailsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import LoginScreen from '../screens/LoginScreen';
 
+import ProfileScreen from '../screens/ProfileScreen';
+import LoginScreen from '../screens/LoginScreen';
+import ViewAttendanceScreen from '../screens/ViewAttendanceScreen';
 
 
 import AuthContext from '../store/AuthContext';
@@ -53,10 +56,25 @@ function StudyMaterialStack() {
   );
 }
 
-
-import DatabaseStack from './DatabaseStack.js';
-
 const Tab = createBottomTabNavigator();
+
+const DbStack = createStackNavigator();
+
+function DatabaseStack() {
+  return (
+    <DbStack.Navigator >
+      <DbStack.Screen
+        name="DatabaseHome" 
+        component={DatabaseScreen}
+        options={{ headerShown: true }}
+      />
+      <DbStack.Screen
+        name="ViewAttendanceScreen" component={ViewAttendanceScreen}
+        options={{ headerShown: true }}
+      />
+    </DbStack.Navigator>
+  );
+}
 
 const AppNavigator = () => {
   const authCtx = useContext(AuthContext);
@@ -111,8 +129,13 @@ const AppNavigator = () => {
           return <Ionicons name={iconName} size={size} color={color} />;
         },
 
+
         
         headerShown: route.name !== 'StudyMaterial',
+
+
+        headerShown: route.name !== 'Database',
+
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
