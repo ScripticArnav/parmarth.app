@@ -6,7 +6,8 @@ import { TouchableOpacity, View, Text, Image } from 'react-native';
 
 import HomeScreen from '../screens/HomeScreen.js';
 import EventScreen from '../screens/EventScreen.js';
-import DatabaseScreen from '../screens/DatabaseScreen.js';
+// import DatabaseScreen from '../screens/DatabaseScreen.js';
+import DatabaseStack from './DatabaseStack.js';
 import ProfileScreen from '../screens/ProfileScreen.js';
 import AuthContext from '../store/AuthContext.js';
 import LoginScreen from '../screens/LoginScreen.js';
@@ -48,7 +49,8 @@ const AppNavigator = ({ navigation }) => {
                 height: 50, 
                 marginRight: 10, 
                 borderColor: 'black',
-                borderRadius: 106
+                borderWidth: 0.8,
+                borderRadius: 18
               }}
               resizeMode="contain"
             />
@@ -73,7 +75,7 @@ const AppNavigator = ({ navigation }) => {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Event" component={EventScreen} />
-      <Tab.Screen name="Database" component={DatabaseScreen} />
+      <Tab.Screen name="Database" component={DatabaseStack} />
       <Tab.Screen
         key={isAuth ? 'auth' : 'guest'}
         name="Profile"
