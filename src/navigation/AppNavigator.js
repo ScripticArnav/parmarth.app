@@ -12,7 +12,6 @@ import DatabaseScreen from '../screens/DatabaseScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import LoginScreen from '../screens/LoginScreen';
 
-
 import GoverningCouncilScreen from '../screens/GoverningCouncilScreen';
 import AdvisoryCouncilScreen from '../screens/AdvisoryCouncilScreen';
 import ExecutiveCouncilScreen from '../screens/ExecutiveCouncilScreen';
@@ -38,6 +37,8 @@ function StudyMaterialStack() {
     </StudyStack.Navigator>
   );
 }
+
+import DatabaseStack from './DatabaseStack.js';
 
 const Tab = createBottomTabNavigator();
 const OrgStack = createStackNavigator();
@@ -107,8 +108,9 @@ const AppNavigator = () => {
                 width: 50,
                 height: 50,
                 marginRight: 10,
-                borderColor: 'black',
-                borderRadius: 106,
+                borderWidth: 0.8,
+                borderRadius: 18
+
               }}
               resizeMode="contain"
             />
@@ -132,9 +134,9 @@ const AppNavigator = () => {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="StudyMaterial" component={StudyMaterialStack} />
-      {/* Ab Organization ke andar stack navigator set kiya */}
       <Tab.Screen name="Organization" component={OrganizationStack} />
       <Tab.Screen name="Database" component={DatabaseScreen} />
+      <Tab.Screen name="Database" component={DatabaseStack} />
       <Tab.Screen
         key={isAuth ? 'auth' : 'guest'}
         name="Profile"
