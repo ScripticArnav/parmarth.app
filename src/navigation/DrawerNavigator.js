@@ -39,7 +39,7 @@ const CustomDrawerContent = (props) => {
       <BlurView intensity={60} style={styles.blurBackground}>
         <View style={styles.profileSection}>
           <Image
-            source={require("../../assets/profile.jpg")}
+            source={require("../../assets/logo.jpg")}
             style={styles.profilePic}
           />
           <Text style={styles.username}>Parmarth User</Text>
