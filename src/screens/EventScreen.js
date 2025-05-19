@@ -1,22 +1,29 @@
-import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 
-const classes = [
-  'KG', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', 
-  '9th', '10th', '11th', '12th', 'JEE', 'NEET'
+const events = [
+  { name: 'उद्यम', description: 'रोज़गार सृजन की पहल' },
+  { name: 'उम्मीद', description: 'अनाथ बच्चों की सहायता' },
+  { name: 'उत्तरायण', description: 'कंबल वितरण अभियान' },
+  { name: 'उत्साह', description: 'विद्यालयी प्रतियोगिता' },
+  { name: 'उत्सर्ग', description: 'सेवा भाव का परिचय' },
+  { name: 'मुस्कान', description: 'बच्चों के चेहरे पर मुस्कान लाना' },
+  { name: 'शैक्षिक भ्रमण', description: 'शैक्षिक संस्थानों का दौरा' },
+  { name: 'रक्तदान महादान', description: 'स्वैच्छिक रक्तदान शिविर' },
+  { name: 'उत्सव आयोजन', description: 'वार्षिक सांस्कृतिक कार्यक्रम' },
 ];
 
-export default function StudyMaterialScreen({ navigation }) {
+export default function EventScreen({ navigation }) {
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.header}>Study Material</Text>
-      {classes.map((item) => (
+      <Text style={styles.header}>Events</Text>
+      {events.map((event, index) => (
         <TouchableOpacity 
-          key={item}
-          style={styles.button} 
-          onPress={() => navigation.navigate('Class' + item)}
+          key={index}
+          style={styles.button}
+          onPress={() => navigation.navigate('EventDetails', { eventName: event.name, eventDescription: event.description })}
         >
-          <Text style={styles.buttonText}>{item} Class</Text>
+          <Text style={styles.eventName}>{event.name}</Text>
+          <Text style={styles.description}>{event.description}</Text>
         </TouchableOpacity>
       ))}
     </ScrollView>
@@ -27,25 +34,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f0f8ff',
+    backgroundColor: '#fefefe',
   },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 16,
-    color: '#333',
+    color: '#222',
   },
   button: {
-    backgroundColor: '#4CAF50',
-    padding: 15,
-    marginVertical: 5,
-    borderRadius: 8,
-    alignItems: 'center',
+    backgroundColor: '#e0f7fa',
+    padding: 14,
+    marginVertical: 8,
+    borderRadius: 10,
+    borderLeftWidth: 5,
+    borderLeftColor: '#00796b',
   },
-  buttonText: {
-    fontSize: 20,
-    color: '#fff',
+  eventName: {
+    fontSize: 22,
     fontWeight: 'bold',
+    color: '#00796b',
+  },
+  description: {
+    fontSize: 16,
+    color: '#444',
+    marginTop: 4,
   },
 });
