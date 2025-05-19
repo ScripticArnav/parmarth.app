@@ -10,6 +10,11 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import AuthContext from "../store/AuthContext";
+// import jwtDecode from "jwt-decode";
+import * as jwtDecode from "jwt-decode";
+
+
+ // npm install jwt-decode
 
 const AttendanceScreen = () => {
   const authCtx = useContext(AuthContext);
@@ -84,6 +89,19 @@ const AttendanceScreen = () => {
 
       authCtx.login(data.token); // 1-hour token set by backend
       Alert.alert("Success", "Logged in successfully!");
+
+      console.log(jwtDecode);
+      
+      const decoded = jwtDecode.jwtDecode(data.token);
+      const expTime = decoded.exp * 1000; // exp is in seconds, convert to ms
+      const currentTime = Date.now();
+      const timeout = expTime - currentTime;
+
+      // Set logout timer
+      setTimeout(() => {
+        Alert.alert("Session expired", "Please login again.");
+        authCtx.logout();
+      }, timeout);
     } catch (error) {
       Alert.alert("Error", error.message);
     }
@@ -97,7 +115,10 @@ const AttendanceScreen = () => {
 
     const rollRegex = /^\d{13}$/;
     if (!rollRegex.test(rollNo)) {
-      Alert.alert("Invalid Roll Number", "Roll Number must be exactly 13 digits.");
+      Alert.alert(
+        "Invalid Roll Number",
+        "Roll Number must be exactly 13 digits."
+      );
       return;
     }
 
