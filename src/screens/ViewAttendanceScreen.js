@@ -16,7 +16,7 @@ export default function ViewAttendanceScreen() {
   );
   const [attendanceList, setAttendanceList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false); // calendar toggle
+  const [showCalendar, setShowCalendar] = useState(false);
 
   useEffect(() => {
     fetchAttendance(selectedDate);
@@ -42,15 +42,20 @@ export default function ViewAttendanceScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.subHeading}>
-        <Text style={styles.normalText}>Attendance on </Text>
-        <TouchableOpacity onPress={() => setShowCalendar(!showCalendar)}>
-          <Text style={styles.dateText}>{selectedDate}</Text>
+      <View style={styles.dateHeader}>
+        <Text style={styles.dateHeaderText}>
+          Attendance on <Text style={styles.highlight}>{selectedDate}</Text>
+        </Text>
+        <TouchableOpacity
+          onPress={() => setShowCalendar(!showCalendar)}
+          style={styles.editButton}
+        >
+          <Text style={styles.editButtonText}>
+            {showCalendar ? "Close Calendar" : "Change Date"}
+          </Text>
         </TouchableOpacity>
-        <Text style={styles.normalText}> :</Text>
       </View>
 
-      
       {showCalendar && (
         <View style={styles.calendarWrapper}>
           <ScrollView
@@ -78,10 +83,10 @@ export default function ViewAttendanceScreen() {
       )}
 
       {loading ? (
-        <Text>Loading...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       ) : attendanceList.length === 0 ? (
         <View style={styles.centerMessageWrapper}>
-          <Text>It was a Holiday...</Text>
+          <Text style={styles.noDataText}>It was a Holiday...</Text>
         </View>
       ) : (
         <FlatList
@@ -90,8 +95,10 @@ export default function ViewAttendanceScreen() {
           renderItem={({ item }) => (
             <View style={styles.card}>
               <Text style={styles.name}>{item.volName}</Text>
-              <Text>Roll No: {item.rollNo}</Text>
-              <Text>Branch: {item.branch}</Text>
+              <View style={styles.detailsRow}>
+                <Text style={styles.detailText}>Roll No: {item.rollNo}</Text>
+                <Text style={styles.detailText}>Branch: {item.branch}</Text>
+              </View>
             </View>
           )}
         />
@@ -106,30 +113,61 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#fff",
   },
-  subHeading: {
-    marginTop: 16,
+  dateHeader: {
+    marginTop: 20,
+    marginBottom: 12,
+    alignItems: "center",
     flexDirection: "row",
-    alignItems: "center", // THIS LINE MAKES ALIGNMENT PERFECT
+    justifyContent: "center",
     flexWrap: "wrap",
+    gap: 8,
   },
-  normalText: {
-    fontSize: 16,
+  dateHeaderText: {
+    fontSize: 18,
     fontWeight: "600",
+    color: "#34495e",
   },
-  dateText: {
-    color: "#007AFF",
+  highlight: {
+    color: "#4a90e2",
+    fontWeight: "700",
+  },
+  editButton: {
+    backgroundColor: "#4a90e2",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    marginLeft: 12,
+  },
+  editButtonText: {
+    color: "#fff",
     fontWeight: "600",
-    fontSize: 16,
+    fontSize: 14,
   },
-  card: {
-    padding: 12,
-    backgroundColor: "#f1f1f1",
-    borderRadius: 10,
-    marginTop: 10,
+   card: {
+    backgroundColor: "#e6f0ff",  // Light pastel blue
+    borderRadius: 14,
+    padding: 16,
+    marginTop: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
   },
+
   name: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#2c3e50",
+    marginBottom: 8,
+  },
+  detailsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  detailText: {
+    fontSize: 15,
+    color: "#555",
   },
   calendarWrapper: {
     borderWidth: 1,
@@ -138,8 +176,8 @@ const styles = StyleSheet.create({
     padding: 4,
     marginVertical: 10,
     backgroundColor: "#f9f9f9",
-    maxHeight: 280,   // Height limit for the calendar container
-    width: 320,       // Width limit (adjust as needed)
+    maxHeight: 280,
+    width: 320,
     alignSelf: "center",
   },
   calendarScroll: {
@@ -152,5 +190,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  noDataText: {
+    fontSize: 16,
+    color: "#7f8c8d",
+    fontStyle: "italic",
+  },
+  loadingText: {
+    textAlign: "center",
+    marginTop: 10,
+    fontSize: 16,
+    color: "#34495e",
   },
 });
