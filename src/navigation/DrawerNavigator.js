@@ -15,7 +15,7 @@ import Animated, {
 
 import AppNavigator from "./AppNavigator";
 import AttendanceScreen from "../screens/AttendanceScreen";
-import EventsScreen from "../screens/EventsScreen";
+import StudyUploadScreen from "../screens/StudyUploadScreen";
 import AboutScreen from "../screens/AboutScreen";
 import AuthContext from "../store/AuthContext"; // Path check kar lena
 
@@ -42,7 +42,7 @@ const CustomDrawerContent = (props) => {
             source={require("../../assets/logo.jpg")}
             style={styles.profilePic}
           />
-          <Text style={styles.username}>Parmarth User</Text>
+          <Text style={styles.username}>PARMARTH IET Lucknow</Text>
         </View>
 
         <DrawerItemList {...props} />
@@ -124,13 +124,13 @@ export default function DrawerNavigator() {
       </Drawer.Screen>
 
       <Drawer.Screen
-        name="Attendance"
+        name="Mark Attendance"
         component={AttendanceScreen}
         options={{ headerShown: true }}
       />
       <Drawer.Screen
-        name="Events"
-        component={EventsScreen}
+        name="Upload Study Materials"
+        component={StudyUploadScreen}
         options={{ headerShown: true }}
       />
       <Drawer.Screen
@@ -154,8 +154,9 @@ const styles = StyleSheet.create({
   profilePic: {
     width: 80,
     height: 80,
-    borderRadius: 40,
+    borderRadius: 20,
     marginBottom: 10,
+    borderWidth: 1,
   },
   username: {
     fontSize: 18,
