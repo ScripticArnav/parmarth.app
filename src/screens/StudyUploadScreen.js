@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,139 +7,122 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
-} from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import * as DocumentPicker from 'expo-document-picker';
-import backendUrl from '../../backendUrl';
+} from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import * as DocumentPicker from "expo-document-picker";
+import backendUrl from "../../backendUrl";
 
 export default function StudyUploadScreen() {
   const classOptions = [
-    'GE', 'KG', '1st', '2nd', '3rd', '4th', '5th',
-    '6th', '7th', '8th', '9th', '10th', '11th', '12th',
+    "GE",
+    "KG",
+    "1st",
+    "2nd",
+    "3rd",
+    "4th",
+    "5th",
+    "6th",
+    "7th",
+    "8th",
+    "9th",
+    "10th",
+    "11th",
+    "12th",
   ];
-  const examOptions = ['JEE', 'NEET'];
+  const examOptions = ["JEE", "NEET"];
+  const subjects = [
+    "Hindi",
+    "English",
+    "Math",
+    "Science",
+    "Social Science",
+    "GK",
+    "Computer",
+  ];
 
-  const subjects = ['Hindi', 'English', 'Math', 'Science', 'Social Science', 'GK', 'Computer'];
-
-  const [classOrExam, setClassOrExam] = useState('');
-  const [subject, setSubject] = useState('');
-  const [title, setTitle] = useState('');
-  const [type, setType] = useState('pdf');
+  const [classOrExam, setClassOrExam] = useState("");
+  const [subject, setSubject] = useState("");
+  const [title, setTitle] = useState("");
+  const [type, setType] = useState("pdf");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [picking, setPicking] = useState(false);
 
-  const allowedTypes = [
-    'application/pdf',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'text/plain',
-    'application/vnd.ms-powerpoint',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-  ];
-
   const pickDocument = async () => {
-    console.log('Starting document picker...');
-    setPicking(true);
     try {
-      const res = await DocumentPicker.getDocumentAsync({
-        type: '*/*', // can change to allowedTypes later
-        copyToCacheDirectory: true,
-        multiple: false,
-      });
+      setPicking(true);
+      const result = await DocumentPicker.getDocumentAsync({ type: "*/*" });
 
-      console.log('Document Picker Result:', res);
-
-      if (!res.canceled && res.assets && res.assets.length > 0) {
-        const pickedFile = res.assets[0];
-
-        // Validate file type
-        if (!allowedTypes.includes(pickedFile.mimeType)) {
-          Alert.alert('Invalid File Type', 'Please select a valid document (PDF, DOC, PPT, etc).');
-          return;
-        }
-
-        console.log('Picked file:', pickedFile);
-        setFile(pickedFile);
-      } else {
-        Alert.alert('Cancelled', 'No document selected.');
+      if (!result.canceled) {
+        const fileInfo = result.assets[0];
+        setFile(fileInfo);
       }
-    } catch (err) {
-      console.error('Document Picker Error:', err);
-      Alert.alert('Error', 'Could not pick the document.');
+    } catch (error) {
+      Alert.alert("Error", "Could not pick file");
+      console.error(error);
     } finally {
       setPicking(false);
     }
   };
 
- const handleUpload = async () => {
-  console.log('Upload triggered...');
-  console.log('Field values:', { classOrExam, subject, title, type, file });
+  const handleUpload = async () => {
+    if (!file) {
+      Alert.alert("Error", "Please pick a file to upload.");
+      return;
+    }
 
-  if (!classOrExam || !subject.trim() || !title.trim() || !type || !file) {
-    console.warn('Missing fields:', { classOrExam, subject, title, type, file });
-    Alert.alert('Error', 'Please fill in all fields and select a valid file.');
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append('className', classOrExam);
-  formData.append('subject', subject.trim());
-  formData.append('title', title.trim());
-  formData.append('type', type);
-
-  let fileUri = file.uri;
-  if (!fileUri.startsWith('file://')) {
-    fileUri = 'file://' + fileUri;
-  }
-
-  formData.append('file', {
-    uri: fileUri,
-    name: file.name,
-    type: file.mimeType || 'application/octet-stream',
-  });
-
-  setLoading(true);
-  try {
-    const response = await fetch(`${backendUrl}/materials/upload`, {
-      method: 'POST',
-      body: formData,
-      // headers: {
-      //   'Content-Type': 'multipart/form-data',
-      // },
-    });
-
-    const rawText = await response.text();
-    console.log('Raw server response:', rawText);
-
-    let data;
     try {
-      data = JSON.parse(rawText);
-    } catch (parseErr) {
-      console.error('Invalid JSON received from server:', parseErr);
-      throw new Error('Server did not return valid JSON.');
-    }
+      setLoading(true);
 
-    if (response.ok) {
-      Alert.alert('Success', 'Material uploaded successfully.');
-      console.log('Upload success:', data);
-      setClassOrExam('');
-      setSubject('');
-      setTitle('');
-      setType('pdf');
-      setFile(null);
-    } else {
-      console.error('Upload failed:', data);
-      Alert.alert('Error', data.message || 'Upload failed.');
-    }
-  } catch (error) {
-    console.error('Upload error:', error);
-    Alert.alert('Error', 'Something went wrong during upload.');
-  } finally {
-    setLoading(false);
-  }
-};
+      const formData = new FormData();
+      formData.append("file", {
+        uri: file.uri,
+        name: file.name,
+        type: file.mimeType || "application/octet-stream",
+      });
+      formData.append("classOrExam", classOrExam);
+      formData.append("subject", subject);
+      formData.append("title", title);
+      formData.append("type", type);
 
+      const response = await fetch(`${backendUrl}/study/upload`, {
+
+        method: "POST",
+        body: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Accept: "application/json",
+        },
+      });
+
+      const contentType = response.headers.get("content-type");
+      let data;
+
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        console.error("Non-JSON response:", text);
+        throw new Error("Unexpected response from server");
+      }
+
+      if (response.ok) {
+        Alert.alert("Success", "Material uploaded successfully!");
+        setClassOrExam("");
+        setSubject("");
+        setTitle("");
+        setType("pdf");
+        setFile(null);
+      } else {
+        Alert.alert("Upload Failed", data?.error || "Something went wrong");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      Alert.alert("Error", "Upload failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -147,10 +130,7 @@ export default function StudyUploadScreen() {
 
       <Text style={styles.label}>Class / Exam:</Text>
       <View style={styles.pickerWrapper}>
-        <Picker
-          selectedValue={classOrExam}
-          onValueChange={(itemValue) => setClassOrExam(itemValue)}
-        >
+        <Picker selectedValue={classOrExam} onValueChange={setClassOrExam}>
           <Picker.Item label="Select Class or Exam" value="" />
           {classOptions.map((cls) => (
             <Picker.Item label={`Class ${cls}`} value={`Class ${cls}`} key={cls} />
@@ -160,12 +140,10 @@ export default function StudyUploadScreen() {
           ))}
         </Picker>
       </View>
-      <Text style={styles.label}>Subjects</Text>
+
+      <Text style={styles.label}>Subject:</Text>
       <View style={styles.pickerWrapper}>
-        <Picker
-          selectedValue={subject}
-          onValueChange={(itemValue) => setSubject(itemValue)}
-        >
+        <Picker selectedValue={subject} onValueChange={setSubject}>
           <Picker.Item label="Select Subject" value="" />
           {subjects.map((sbj) => (
             <Picker.Item label={sbj} value={sbj} key={sbj} />
@@ -182,7 +160,7 @@ export default function StudyUploadScreen() {
 
       <Text style={styles.label}>Type:</Text>
       <View style={styles.pickerWrapper}>
-        <Picker selectedValue={type} onValueChange={(val) => setType(val)}>
+        <Picker selectedValue={type} onValueChange={setType}>
           <Picker.Item label="PDF" value="pdf" />
           <Picker.Item label="Video" value="video" />
           <Picker.Item label="Note" value="note" />
@@ -190,7 +168,7 @@ export default function StudyUploadScreen() {
       </View>
 
       <Button
-        title={file ? `Change File (${file.name})` : 'Pick File'}
+        title={file ? `Change File (${file.name})` : "Pick File"}
         onPress={pickDocument}
         disabled={picking}
       />
@@ -199,14 +177,14 @@ export default function StudyUploadScreen() {
         <View style={styles.previewBox}>
           <Text style={styles.previewText}>📄 File Selected:</Text>
           <Text>Name: {file.name}</Text>
-          <Text>Type: {file.mimeType || 'Unknown type'}</Text>
+          <Text>Type: {file.mimeType || "Unknown type"}</Text>
           <Text>Size: {(file.size / 1024).toFixed(2)} KB</Text>
         </View>
       )}
 
       <View style={{ marginTop: 20 }}>
         <Button
-          title={loading ? 'Uploading...' : 'Upload Material'}
+          title={loading ? "Uploading..." : "Upload Material"}
           onPress={handleUpload}
           disabled={loading}
         />
@@ -219,30 +197,30 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     paddingBottom: 40,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   header: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    color: '#4A148C',
-    textAlign: 'center',
+    color: "#4A148C",
+    textAlign: "center",
   },
   label: {
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 6,
     fontSize: 16,
   },
   pickerWrapper: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 8,
     marginBottom: 15,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     marginBottom: 15,
     padding: 12,
     borderRadius: 8,
@@ -251,12 +229,12 @@ const styles = StyleSheet.create({
   previewBox: {
     marginTop: 20,
     padding: 12,
-    backgroundColor: '#f2f2f2',
+    backgroundColor: "#f2f2f2",
     borderRadius: 8,
   },
   previewText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
 });
