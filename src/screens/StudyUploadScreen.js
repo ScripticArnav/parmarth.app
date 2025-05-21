@@ -33,6 +33,7 @@ export default function StudyUploadScreen() {
   ];
   const examOptions = ["JEE", "NEET"];
   const subjects = [
+    "HomeWork",
     "Hindi",
     "English",
     "Math",

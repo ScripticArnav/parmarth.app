@@ -20,6 +20,7 @@ export default function MaterialDetailsScreen({ route }) {
   const [currentUrl, setCurrentUrl] = useState('');
 
   const subjects = [
+    'HomeWork',
     'Hindi',
     'English',
     'Math',
@@ -30,6 +31,7 @@ export default function MaterialDetailsScreen({ route }) {
   ];
 
   const subjectIcons = {
+    HomeWork: '📚',
     Hindi: '📝',
     English: '📘',
     Math: '➗',
