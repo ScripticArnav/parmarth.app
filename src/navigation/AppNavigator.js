@@ -16,6 +16,7 @@ import EventScreen from '../screens/EventScreen';
 import EventDetailsScreen from '../screens/EventDetailsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import LoginScreen from '../screens/LoginScreen';
+import TotalAttendanceScreen from '../screens/TotalAttendanceScreen.js';
 
 
 import AuthContext from '../store/AuthContext';
@@ -94,6 +95,7 @@ function DatabaseStack() {
       <DbStack.Screen name="StudentsScreen" component={StudentsScreen} options={{ title: "Students Details" }} />
       <DbStack.Screen name="EventsScreen" component={EventScreen} />
       <DbStack.Screen name="EventDetails" component={EventDetailsScreen} />
+      <DbStack.Screen name="TotalAttendanceScreen" component={TotalAttendanceScreen} />
     </DbStack.Navigator>
   );
 }
