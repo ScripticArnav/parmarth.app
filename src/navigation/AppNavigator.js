@@ -93,10 +93,39 @@ function DatabaseStack() {
       <DbStack.Screen name="AdmissionScreen" component={AdmissionScreen} options={{ title: "Admissions Overview" }} />
       <DbStack.Screen name="RTEYearDetails" component={RTEYearScreen} options={{ title: "RTE Admissions" }} />
       <DbStack.Screen name="StudentsScreen" component={StudentsScreen} options={{ title: "Students Details" }} />
-      <DbStack.Screen name="EventsScreen" component={EventScreen} />
-      <DbStack.Screen name="EventDetails" component={EventDetailsScreen} />
-      <DbStack.Screen name="TotalAttendanceScreen" component={TotalAttendanceScreen} />
+      <DbStack.Screen name="TotalAttendanceScreen" component={TotalAttendanceScreen} options={{ title: "Volunteers Total Attendence" }} />
     </DbStack.Navigator>
+  );
+}
+const EvStack = createStackNavigator();
+
+function EventStack() {
+  return (
+    <EvStack.Navigator screenOptions={{
+      headerRight: () => (
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 16 }}>
+          <Image
+            source={require('../../assets/logo.jpg')}
+            style={{
+              width: 50,
+              height: 50,
+              marginRight: 10,
+              borderWidth: 0.8,
+              borderRadius: 18,
+            }}
+            resizeMode="contain"
+          />
+        </View>
+      ),
+    }}
+    >
+      <EvStack.Screen
+        name="Events in Parmarth"
+        component={EventScreen}
+        options={{ headerShown: true }}
+      />
+      <DbStack.Screen name="EventDetails" component={EventDetailsScreen} />
+    </EvStack.Navigator>
   );
 }
 
@@ -148,6 +177,7 @@ const AppNavigator = () => {
           if (route.name === 'Home') iconName = 'home-outline';
           else if (route.name === 'StudyMaterial') iconName = 'book-outline';
           else if (route.name === 'Database') iconName = 'folder-outline';
+          else if (route.name === 'Event') iconName = 'calendar-outline';
           else if (route.name === 'Profile') iconName = 'person-outline';
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -158,6 +188,7 @@ const AppNavigator = () => {
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="StudyMaterial" component={StudyMaterialStack} options={{ headerShown: false }} />
       <Tab.Screen name="Database" component={DatabaseStack} options={{ headerShown: false }} />
+      <Tab.Screen name="Event" component={EventStack} options={{ headerShown: false }} />
       <Tab.Screen
         key={isAuth ? 'auth' : 'guest'}
         name="Profile"

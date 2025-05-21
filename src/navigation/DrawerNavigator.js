@@ -16,6 +16,7 @@ import Animated, {
 import AppNavigator from "./AppNavigator";
 import AttendanceScreen from "../screens/AttendanceScreen";
 import StudyUploadScreen from "../screens/StudyUploadScreen";
+import EventUploadScreen from "../screens/EventUploadScreen";
 import AboutScreen from "../screens/AboutScreen";
 import AuthContext from "../store/AuthContext"; // Path check kar lena
 
@@ -131,6 +132,11 @@ export default function DrawerNavigator() {
       <Drawer.Screen
         name="Upload Study Materials"
         component={StudyUploadScreen}
+        options={{ headerShown: true }}
+      />
+      <Drawer.Screen
+        name="Upload Events Photos"
+        component={EventUploadScreen}
         options={{ headerShown: true }}
       />
       <Drawer.Screen
