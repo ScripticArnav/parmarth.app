@@ -28,7 +28,6 @@ const AttendanceScreen = () => {
   ]);
 
   const [classWise, setClassWise] = useState([{ className: "", count: "" }]);
-  const [totalStudents, setTotalStudents] = useState("");
   const [photos, setPhotos] = useState([]);
 
   const classGroups = [
@@ -160,11 +159,6 @@ const AttendanceScreen = () => {
       }
     }
 
-    if (!totalStudents) {
-      Alert.alert("Error", "Please enter total student count.");
-      return;
-    }
-
     const classWiseMap = {};
     for (let item of classWise) {
       if (!item.className || isNaN(Number(item.count))) {
@@ -177,7 +171,6 @@ const AttendanceScreen = () => {
     const formData = new FormData();
     formData.append("volunteers", JSON.stringify(volunteers));
     formData.append("classWise", JSON.stringify(classWiseMap));
-    formData.append("totalStudents", Number(totalStudents));
 
     photos.forEach((photo, index) => {
       formData.append("photos", {
@@ -202,7 +195,6 @@ const AttendanceScreen = () => {
       Alert.alert("Success", data.message || "Attendance marked!");
       setVolunteers([{ volName: "", rollNo: "", branch: "" }]);
       setClassWise([{ className: "", count: "" }]);
-      setTotalStudents("");
       setPhotos([]);
     } catch (error) {
       Alert.alert("Error", error.message);
@@ -284,7 +276,7 @@ const AttendanceScreen = () => {
               style={styles.picker}
             >
               <Picker.Item
-                label="-- Select Branch --"
+                label="Select Branch"
                 value=""
                 enabled={false}
               />
@@ -321,7 +313,7 @@ const AttendanceScreen = () => {
                 style={styles.picker}
               >
                 <Picker.Item
-                  label="-- Select Class Group --"
+                  label="Select Class Group"
                   value=""
                   enabled={false}
                 />
@@ -358,18 +350,6 @@ const AttendanceScreen = () => {
       >
         <Text style={styles.buttonText}>Add Class Group</Text>
       </TouchableOpacity>
-
-      <TextInput
-        placeholder="Total Students"
-        value={totalStudents}
-        onChangeText={(text) => {
-          const numericText = text.replace(/[^0-9]/g, "");
-          setTotalStudents(numericText);
-        }}
-        keyboardType="numeric"
-        style={styles.input}
-        placeholderTextColor="#666"
-      />
 
       <Text style={styles.subHeading}>Upload Photos</Text>
       <View style={styles.photoContainer}>
@@ -436,6 +416,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     alignItems: "center",
     marginTop: 20,
+    marginBottom: 50,
   },
   buttonText: { color: "#fff", fontWeight: "600", fontSize: 16 },
   classRow: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
