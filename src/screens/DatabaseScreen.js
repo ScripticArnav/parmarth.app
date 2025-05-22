@@ -44,11 +44,7 @@ const DatabaseScreen = () => {
           screenName="AdmissionScreen"
           bgColor="#FF5722"
         />
-        <CustomButton
-          title="Events in Parmarth"
-          screenName="EventsScreen"
-          bgColor="#673AB7"
-        />
+        
         {isLoggedIn && <CustomButton
           title="Total Attendance"
           screenName="TotalAttendanceScreen"

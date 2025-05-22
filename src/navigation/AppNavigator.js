@@ -124,7 +124,7 @@ function EventStack() {
         component={EventScreen}
         options={{ headerShown: true }}
       />
-      <DbStack.Screen name="EventDetails" component={EventDetailsScreen} />
+      <DbStack.Screen name="EventDetails" component={EventDetailsScreen} options={{ title: "Events Photos" }} />
     </EvStack.Navigator>
   );
 }
