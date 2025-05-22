@@ -1,27 +1,80 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
+import ImageViewing from 'react-native-image-viewing';
+import backendUrl from '../../backendUrl';
 
 export default function EventDetailsScreen({ route }) {
-  const { title, photos } = route.params;
+  const { eventName } = route.params;
+  const [photos, setPhotos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  useEffect(() => {
+    fetchEventPhotos();
+  }, []);
+
+  const fetchEventPhotos = async () => {
+    try {
+      const res = await fetch(`${backendUrl}/event/photos/${encodeURIComponent(eventName)}`);
+      const data = await res.json();
+
+      if (res.ok) {
+        setPhotos(data.photos || []);
+      } else {
+        console.error('Error:', data.message);
+        setPhotos([]);
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      setPhotos([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImagePress = (index) => {
+    setSelectedIndex(index);
+    setIsVisible(true);
+  };
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.title}>{eventName}</Text>
 
-      {!Array.isArray(photos) || photos.length === 0 ? (
-        <Text style={styles.noPhotos}>No photos uploaded.</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#00695c" />
+      ) : !photos.length ? (
+        <Text style={styles.noPhotos}>No photos uploaded yet.</Text>
       ) : (
         <View style={styles.photoGrid}>
           {photos.map((uri, index) => (
-            <Image
-              key={index}
-              source={{ uri }}
-              style={styles.photo}
-              resizeMode="cover"
-            />
+            <TouchableOpacity key={index} onPress={() => handleImagePress(index)}>
+              <Image source={{ uri }} style={styles.photo} resizeMode="cover" />
+            </TouchableOpacity>
           ))}
         </View>
       )}
+
+      <ImageViewing
+        images={photos.map((uri) => ({ uri }))}
+        imageIndex={selectedIndex}
+        visible={isVisible}
+        onRequestClose={() => setIsVisible(false)}
+        swipeToCloseEnabled={true}
+        presentationStyle="overFullScreen"
+        animationType="fade"
+        backgroundColor="#000"
+      />
     </ScrollView>
   );
 }
@@ -32,20 +85,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#fff',
   },
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#00695c',
-    marginBottom: 20,
+    color: '#6A1B9A',
+    marginBottom: 25,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   noPhotos: {
     textAlign: 'center',
     fontSize: 16,
     color: '#999',
-    marginTop: 20,
+    marginTop: 30,
   },
   photoGrid: {
     flexDirection: 'row',
@@ -53,10 +108,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   photo: {
-    width: (screenWidth - 48) / 2, // 16 padding * 2 + 16 gap
+    width: (screenWidth - 48) / 2,
     height: 160,
-    borderRadius: 10,
+    borderRadius: 12,
     marginBottom: 16,
-    backgroundColor: '#ccc',
+    backgroundColor: '#eee',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
 });

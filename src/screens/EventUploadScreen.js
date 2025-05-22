@@ -31,8 +31,8 @@ export default function EventPhotoUploadScreen() {
   const [loading, setLoading] = useState(false);
 
   const pickImages = async () => {
-    if (photos.length >= 10) {
-      Alert.alert("Limit Reached", "You can upload up to 10 photos.");
+    if (photos.length >= 7) {
+      Alert.alert("Limit Reached", "You can upload up to 7 photos.");
       return;
     }
 
@@ -40,7 +40,7 @@ export default function EventPhotoUploadScreen() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,
       quality: 0.8,
-      selectionLimit: 10 - photos.length,
+      selectionLimit: 7 - photos.length,
     });
 
     if (!result.canceled) {
@@ -109,12 +109,12 @@ export default function EventPhotoUploadScreen() {
       <TouchableOpacity
         style={styles.pickBtn}
         onPress={pickImages}
-        disabled={photos.length >= 10}
+        disabled={photos.length >= 7}
       >
         <Text style={styles.pickBtnText}>
-          {photos.length >= 10
-            ? "📷 Max 10 Photos Added"
-            : `📷 Pick Photos (${photos.length}/10)`}
+          {photos.length >= 7
+            ? "📷 Max 7 Photos Added"
+            : `📷 Pick Photos (${photos.length}/7)`}
         </Text>
       </TouchableOpacity>
 
