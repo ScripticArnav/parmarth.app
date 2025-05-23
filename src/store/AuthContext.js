@@ -6,10 +6,8 @@ let logoutTimer;
 const AuthContext = React.createContext({
   token: "",
   isLoggedIn: false,
-  userType: "",
-  fillUserType: (userType) => {},
-  nullUserType: () => {},
-  login: (token) => {},
+  loginMethod: "",
+  login: (token, loginMethod) => {},
   logout: () => {},
 });
 
@@ -21,53 +19,51 @@ const calculateRemainingTime = (expirationTime) => {
 };
 
 const retrieveStoredToken = async () => {
-  try {
-    const storedToken = await AsyncStorage.getItem("token");
-    const storedExpirationTime = await AsyncStorage.getItem("expirationTime");
+  const storedToken = await AsyncStorage.getItem("token");
+  const storedExpirationDate = await AsyncStorage.getItem("expirationTime");
+  const storedLoginMethod = await AsyncStorage.getItem("loginMethod");
 
-    if (!storedToken || !storedExpirationTime) return null;
+  const remainingTime = calculateRemainingTime(storedExpirationDate);
 
-    const remainingTime = calculateRemainingTime(storedExpirationTime);
-
-    if (remainingTime <= 43200) {
-      await AsyncStorage.multiRemove(["token", "expirationTime", "userId"]);
-      return null;
-    }
-
-    return {
-      token: storedToken,
-      expirationTime: storedExpirationTime,
-      duration: remainingTime,
-    };
-  } catch (err) {
+  if (remainingTime <= 3600) {
+    await AsyncStorage.multiRemove(["token", "expirationTime", "loginMethod"]);
     return null;
   }
+
+  return {
+    token: storedToken,
+    duration: remainingTime,
+    loginMethod: storedLoginMethod,
+  };
 };
 
 export const AuthContextProvider = (props) => {
   const [token, setToken] = useState(null);
-  const [userType, setUserType] = useState("");
+  const [loginMethod, setLoginMethod] = useState("");
   const userIsLoggedIn = !!token;
-
-  const fillUserType = (userType) => setUserType(userType);
-  const nullUserType = () => setUserType("");
 
   const logoutHandler = useCallback(async () => {
     setToken(null);
-    await AsyncStorage.multiRemove(["token", "expirationTime", "userId"]);
+    setLoginMethod("");
+    await AsyncStorage.multiRemove(["token", "expirationTime", "loginMethod"]);
     if (logoutTimer) {
       clearTimeout(logoutTimer);
     }
   }, []);
 
-  const loginHandler = async (token, expirationTime, userId) => {
+  const loginHandler = async (token, expirationTime, userId, loginMethod) => {
+    if (!["password", "otp"].includes(loginMethod)) {
+      throw new Error("Invalid login method");
+    }
+    
     setToken(token);
+    setLoginMethod(loginMethod);
     await AsyncStorage.setItem("token", token);
     await AsyncStorage.setItem("expirationTime", expirationTime);
     await AsyncStorage.setItem("userId", userId);
+    await AsyncStorage.setItem("loginMethod", loginMethod);
 
     const remainingTime = calculateRemainingTime(expirationTime);
-
     logoutTimer = setTimeout(logoutHandler, remainingTime);
   };
 
@@ -77,6 +73,7 @@ export const AuthContextProvider = (props) => {
 
       if (tokenData) {
         setToken(tokenData.token);
+        setLoginMethod(tokenData.loginMethod);
         logoutTimer = setTimeout(logoutHandler, tokenData.duration);
       }
     };
@@ -87,11 +84,9 @@ export const AuthContextProvider = (props) => {
   const contextValue = {
     token: token,
     isLoggedIn: userIsLoggedIn,
+    loginMethod: loginMethod,
     login: loginHandler,
     logout: logoutHandler,
-    userType: userType,
-    fillUserType,
-    nullUserType,
   };
 
   return (
