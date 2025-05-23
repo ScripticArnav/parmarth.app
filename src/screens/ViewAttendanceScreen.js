@@ -30,30 +30,33 @@ export default function ViewAttendanceScreen() {
     fetchAttendance(selectedDate);
   }, [selectedDate]);
 
-  const fetchAttendance = async (date) => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${backendUrl}/attendance/${date}`);
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to fetch attendance");
-      }
+ const fetchAttendance = async (date) => {
+  setLoading(true);
+  try {
+    const response = await fetch(`${backendUrl}/attendance/${date}`);
+    const data = await response.json();
 
+    if (!response.ok || !data.attendance) {
+      setAttendanceData({ volunteers: [], photos: [], summary: {} });
+    } else {
       setAttendanceData({
-        volunteers: data.attendance?.volunteers || [],
-        photos: data.attendance?.photos || [],
+        volunteers: data.attendance.volunteers || [],
+        photos: data.attendance.photos || [],
         summary: {
-          totalVolunteers: data.attendance?.volunteers?.length || 0,
-          totalStudents: data.attendance?.totalStudents || 0,
-          classWise: data.attendance?.classWise || {},
+          totalVolunteers: data.attendance.volunteers?.length || 0,
+          totalStudents: data.attendance.totalStudents || 0,
+          classWise: data.attendance.classWise || {},
         },
       });
-    } catch (error) {
-      console.error("Error fetching attendance:", error.message);
-      setAttendanceData({ volunteers: [], photos: [], summary: {} });
     }
-    setLoading(false);
-  };
+  } catch (error) {
+    // Agar fetch mein koi network ya baki error aaye, toh bhi empty set karo
+    console.error("Error fetching attendance:", error.message);
+    setAttendanceData({ volunteers: [], photos: [], summary: {} });
+  }
+  setLoading(false);
+};
+
 
   return (
     <View style={styles.container}>

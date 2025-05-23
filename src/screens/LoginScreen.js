@@ -7,18 +7,18 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import AuthContext from "../store/AuthContext.js";
 import Toast from "react-native-toast-message";
 import backendUrl from "../../backendUrl.js";
-import { useNavigation } from "@react-navigation/native";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [userType, setUserType] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const authCtx = useContext(AuthContext);
-  const navigation = useNavigation();
 
   const isEmailValid = (email) => {
     return /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
@@ -50,7 +50,7 @@ const LoginScreen = () => {
       const response = await fetch(`${backendUrl}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, userType }),
       });
 
       const resData = await response.json();
@@ -64,18 +64,16 @@ const LoginScreen = () => {
         authCtx.login(
           resData.token,
           expirationTime.toISOString(),
-          resData.userId
+          resData.userId,
+          userType
         );
         Toast.show({ type: "success", text1: "Successfully logged in" });
-        // onLogin();
-
       } else if (
         resData.message === "Successfully sent 2FA code to email" &&
         resData.userId
       ) {
         Toast.show({ type: "success", text1: resData.message });
         authCtx.setPending2FAUser(resData.userId);
-        // navigation.replace("VerifyCode");
       }
     } catch (err) {
       Toast.show({ type: "error", text1: err.message });
@@ -106,7 +104,17 @@ const LoginScreen = () => {
         }}
       />
 
-      <Text style={styles.tip}>Please use correct credentials</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={userType}
+          onValueChange={(value) => setUserType(value)}
+          style={styles.picker}
+        >
+          <Picker.Item label="Faculty" value="faculty" />
+          <Picker.Item label="Media" value="media" />
+          <Picker.Item label="Master" value="master" />
+        </Picker>
+      </View>
 
       <TouchableOpacity style={styles.button} onPress={loginHandler}>
         {isLoading ? (
@@ -121,43 +129,46 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 30,
+    padding: 20,
     justifyContent: "center",
     backgroundColor: "#fff",
   },
   heading: {
-    fontSize: 30,
-    marginBottom: 30,
-    textAlign: "center",
+    fontSize: 24,
     fontWeight: "bold",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#aaa",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  tip: {
-    fontSize: 14,
-    color: "#888",
     marginBottom: 20,
     textAlign: "center",
   },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    padding: 10,
+    marginBottom: 15,
+    borderRadius: 5,
+  },
   button: {
-    backgroundColor: "#2196f3",
+    backgroundColor: "#007AFF",
     padding: 15,
-    borderRadius: 8,
+    borderRadius: 5,
     alignItems: "center",
   },
   buttonText: {
     color: "#fff",
-    fontWeight: "600",
     fontSize: 16,
+    fontWeight: "bold",
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    marginBottom: 15,
+  },
+  picker: {
+    height: 50,
   },
 });
+
+export default LoginScreen;

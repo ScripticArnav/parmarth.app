@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import backendUrl from "../../backendUrl";
 import {
   View,
@@ -11,18 +11,9 @@ import {
   Image,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import AuthContext from "../store/AuthContext";
-import * as jwtDecode from "jwt-decode";
 import * as ImagePicker from "expo-image-picker";
 
 const AttendanceScreen = () => {
-  const authCtx = useContext(AuthContext);
-  const isLoggedIn = authCtx.isLoggedIn;
-
-  const [name, setName] = useState("");
-  const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-
   const [volunteers, setVolunteers] = useState([
     { volName: "", rollNo: "", branch: "" },
   ]);
@@ -59,60 +50,6 @@ const AttendanceScreen = () => {
       .map((item, i) => (i !== excludeIndex ? item.className : null))
       .filter(Boolean);
     return classGroups.filter((cls) => !selectedClasses.includes(cls));
-  };
-
-  const handleSendOtp = async () => {
-    if (!name.trim()) {
-      Alert.alert("Error", "Please enter your email.");
-      return;
-    }
-
-    try {
-      const response = await fetch(`${backendUrl}/login/send-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Failed to send OTP");
-
-      setOtpSent(true);
-      Alert.alert("Success", "OTP sent to your email.");
-    } catch (error) {
-      Alert.alert("Error", error.message);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (!otp.trim()) {
-      Alert.alert("Error", "Please enter the OTP.");
-      return;
-    }
-
-    try {
-      const response = await fetch(`${backendUrl}/login/verify-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, otp }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Invalid OTP");
-
-      authCtx.login(data.token);
-      Alert.alert("Success", "Logged in successfully!");
-
-      const decoded = jwtDecode.jwtDecode(data.token);
-      const timeout = decoded.exp * 1000 - Date.now();
-
-      setTimeout(() => {
-        Alert.alert("Session expired", "Please login again.");
-        authCtx.logout();
-      }, timeout);
-    } catch (error) {
-      Alert.alert("Error", error.message);
-    }
   };
 
   const handleAddClass = () => {
@@ -184,7 +121,7 @@ const AttendanceScreen = () => {
       const response = await fetch(`${backendUrl}/attendance`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${authCtx.token}`,
+          "Content-Type": "application/json",
         },
         body: formData,
       });
@@ -200,39 +137,6 @@ const AttendanceScreen = () => {
       Alert.alert("Error", error.message);
     }
   };
-
-  if (!isLoggedIn) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.heading}>Volunteer Attendance</Text>
-        <TextInput
-          placeholder="Enter Your Name"
-          value={name}
-          onChangeText={setName}
-          style={styles.input}
-          placeholderTextColor="#666"
-        />
-        {otpSent ? (
-          <>
-            <TextInput
-              placeholder="Enter OTP"
-              value={otp}
-              onChangeText={setOtp}
-              style={styles.input}
-              placeholderTextColor="#666"
-            />
-            <TouchableOpacity style={styles.button} onPress={handleVerifyOtp}>
-              <Text style={styles.buttonText}>Verify OTP</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <TouchableOpacity style={styles.button} onPress={handleSendOtp}>
-            <Text style={styles.buttonText}>Send OTP</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    );
-  }
 
   return (
     <ScrollView style={styles.container}>
