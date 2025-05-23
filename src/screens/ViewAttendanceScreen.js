@@ -19,12 +19,14 @@ export default function ViewAttendanceScreen() {
   );
   const [attendanceData, setAttendanceData] = useState({
     volunteers: [],
+    mentor: [],
     photos: [],
     summary: {},
   });
   const [loading, setLoading] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showVolunteers, setShowVolunteers] = useState(false);
+  const [showMentors, setShowMentors] = useState(false);
 
   useEffect(() => {
     fetchAttendance(selectedDate);
@@ -33,30 +35,40 @@ export default function ViewAttendanceScreen() {
  const fetchAttendance = async (date) => {
   setLoading(true);
   try {
-    const response = await fetch(`${backendUrl}/attendance/${date}`);
-    const data = await response.json();
+    const [volunteerResponse, mentorResponse] = await Promise.all([
+      fetch(`${backendUrl}/attendance/volunteer/${date}`),
+      fetch(`${backendUrl}/attendance/mentor/${date}`)
+    ]);
 
-    if (!response.ok || !data.attendance) {
-      setAttendanceData({ volunteers: [], photos: [], summary: {} });
-    } else {
-      setAttendanceData({
-        volunteers: data.attendance.volunteers || [],
-        photos: data.attendance.photos || [],
-        summary: {
-          totalVolunteers: data.attendance.volunteers?.length || 0,
-          totalStudents: data.attendance.totalStudents || 0,
-          classWise: data.attendance.classWise || {},
-        },
-      });
-    }
+    const volunteerData = await volunteerResponse.json();
+    const mentorData = await mentorResponse.json();
+
+    console.log('Mentor Response:', mentorData);
+    console.log('Mentor Data:', mentorData.attendance?.mentor);
+
+    // Handle both volunteer and mentor data independently
+    const mentorList = mentorData.attendance?.mentor || [];
+    const volunteerList = volunteerData.attendance?.volunteers || [];
+    const photos = volunteerData.attendance?.photos || [];
+    const classWise = volunteerData.attendance?.classWise || {};
+
+    setAttendanceData({
+      volunteers: volunteerList,
+      mentor: mentorList,
+      photos: photos,
+      summary: {
+        totalVolunteers: volunteerList.length,
+        totalMentors: mentorList.length,
+        totalStudents: volunteerData.attendance?.totalStudents || 0,
+        classWise: classWise,
+      },
+    });
   } catch (error) {
-    // Agar fetch mein koi network ya baki error aaye, toh bhi empty set karo
     console.error("Error fetching attendance:", error.message);
-    setAttendanceData({ volunteers: [], photos: [], summary: {} });
+    setAttendanceData({ volunteers: [], mentor: [], photos: [], summary: {} });
   }
   setLoading(false);
 };
-
 
   return (
     <View style={styles.container}>
@@ -165,6 +177,42 @@ export default function ViewAttendanceScreen() {
                   </View>
                 </View>
               ))}
+            </View>
+          )}
+
+          {/* Mentor Toggle */}
+          <TouchableOpacity
+            onPress={() => setShowMentors(!showMentors)}
+            style={styles.toggleButton}
+          >
+            <Text style={styles.toggleButtonText}>
+              {showMentors ? "Hide Mentors Info" : "Show Mentors Info"}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Mentors List */}
+          {showMentors && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>👨‍🏫 Mentors</Text>
+              {console.log('Rendering mentors:', attendanceData.mentor)}
+              {attendanceData.mentor && attendanceData.mentor.length > 0 ? (
+                attendanceData.mentor.map((item, index) => {
+                  console.log('Rendering mentor item:', item);
+                  return (
+                    <View key={item._id || index} style={styles.card}>
+                      <Text style={styles.name}>{item.name}</Text>
+                      <View style={styles.detailsRow}>
+                        <Text style={styles.detailText}>
+                          Roll No: {item.rollNo}
+                        </Text>
+                        <Text style={styles.detailText}>Branch: {item.branch}</Text>
+                      </View>
+                    </View>
+                  );
+                })
+              ) : (
+                <Text style={styles.noDataText}>No mentors present on this date.</Text>
+              )}
             </View>
           )}
 
