@@ -27,7 +27,7 @@ import AttendanceScreen from "../screens/AttendanceScreen";
 import StudyUploadScreen from "../screens/StudyUploadScreen";
 import EventUploadScreen from "../screens/EventUploadScreen";
 import MentorScreen from "../screens/MentorScreen";
-import AboutScreen from "../screens/AboutScreen";
+import TotalAttendanceScreen from "../screens/TotalAttendanceScreen";
 import AuthContext from "../store/AuthContext";
 import backendUrl from "../../backendUrl";
 
@@ -138,10 +138,9 @@ const CustomDrawerContent = (props) => {
       const response = await fetch(`${backendUrl}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          password
-        }),
+
+        body: JSON.stringify({ email, password }),
+
       });
 
       const resData = await response.json();
@@ -475,9 +474,12 @@ export default function DrawerNavigator() {
         }}
       />
       <Drawer.Screen
-        name="About"
-        component={AboutScreen}
-        options={{ headerShown: true }}
+        name="Days of Service"
+        component={TotalAttendanceScreen}
+        options={{ 
+          headerShown: true,
+          drawerItemStyle: { display: (authCtx.loginMethod === "password") ? "flex" : "none" }
+        }}
       />
     </Drawer.Navigator>
   );
