@@ -16,6 +16,7 @@ import EventScreen from '../screens/EventScreen';
 import EventDetailsScreen from '../screens/EventDetailsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import LoginScreen from '../screens/LoginScreen';
+import AboutScreen from '../screens/AboutScreen';
 import TotalAttendanceScreen from '../screens/TotalAttendanceScreen.js';
 
 
@@ -178,7 +179,7 @@ const AppNavigator = () => {
           else if (route.name === 'StudyMaterial') iconName = 'book-outline';
           else if (route.name === 'Database') iconName = 'folder-outline';
           else if (route.name === 'Event') iconName = 'calendar-outline';
-          else if (route.name === 'Profile') iconName = 'person-outline';
+          else if (route.name === 'About') iconName = 'information-circle-outline';
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -189,11 +190,8 @@ const AppNavigator = () => {
       <Tab.Screen name="StudyMaterial" component={StudyMaterialStack} options={{ headerShown: false }} />
       <Tab.Screen name="Database" component={DatabaseStack} options={{ headerShown: false }} />
       <Tab.Screen name="Event" component={EventStack} options={{ headerShown: false }} />
-      <Tab.Screen
-        key={isAuth ? 'auth' : 'guest'}
-        name="Profile"
-        component={isAuth ? ProfileScreen : LoginScreen}
-      />
+      <Tab.Screen name="About" component={AboutScreen} />
+      
     </Tab.Navigator>
   );
 };
