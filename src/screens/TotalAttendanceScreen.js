@@ -21,7 +21,9 @@ const TotalAttendanceScreen = () => {
   const [loading, setLoading] = useState(true);
   const [monthlyLoading, setMonthlyLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('total'); // 'total' or 'monthly'
+  const [activeCategory, setActiveCategory] = useState('volunteer'); // 'volunteer' or 'mentor'
   const [monthPickerVisible, setMonthPickerVisible] = useState(false);
+  const [error, setError] = useState(null);
   
   // Current date for default month selection
   const currentDate = new Date();
@@ -41,26 +43,35 @@ const TotalAttendanceScreen = () => {
   // ✅ Fetch data from backend API
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [activeCategory]);
   
   // Fetch monthly data when month/year changes
   useEffect(() => {
     if (activeTab === 'monthly') {
       fetchMonthlyData();
     }
-  }, [selectedMonth, selectedYear, activeTab]);
+  }, [selectedMonth, selectedYear, activeTab, activeCategory]);
 
   const fetchData = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const res = await fetch(`${backendUrl}/attendance/total`, {
+      const endpoint = activeCategory === 'volunteer' ? 'volunteer' : 'mentor';
+      const res = await fetch(`${backendUrl}/attendance/${endpoint}/total`, {
         headers: {
           Authorization: `Bearer ${authCtx.token}`,
         },
       });
+      
+      if (!res.ok) {
+        throw new Error('Failed to fetch data');
+      }
+      
       const json = await res.json();
-      setData(json.volunteers || []);
+      setData(json.volunteers || json.mentors || []);
     } catch (err) {
-      console.error("Error fetching attendance data:", err);
+      setError('Unable to load attendance data. Please try again later.');
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -68,21 +79,28 @@ const TotalAttendanceScreen = () => {
   
   const fetchMonthlyData = async () => {
     setMonthlyLoading(true);
+    setError(null);
     try {
+      const endpoint = activeCategory === 'volunteer' ? 'volunteer' : 'mentor';
       // API endpoint for monthly data (adjust as needed)
       const res = await fetch(
-        `${backendUrl}/attendance/monthly?month=${selectedMonth + 1}&year=${selectedYear}`,
+        `${backendUrl}/attendance/${endpoint}/monthly?month=${selectedMonth + 1}&year=${selectedYear}`,
         {
           headers: {
             Authorization: `Bearer ${authCtx.token}`,
           },
         }
       );
+      
+      if (!res.ok) {
+        throw new Error('Failed to fetch monthly data');
+      }
+      
       const json = await res.json();
-      console.log(json);
-      setMonthlyData(json.volunteers || []);
+      setMonthlyData(json.volunteers || json.mentors || []);
     } catch (err) {
-      console.error("Error fetching monthly attendance data:", err);
+      setError('Unable to load monthly attendance data. Please try again later.');
+      setMonthlyData([]);
     } finally {
       setMonthlyLoading(false);
     }
@@ -90,30 +108,35 @@ const TotalAttendanceScreen = () => {
 
   // ✅ CSV Export
   const exportToCSV = async () => {
-    const exportData = activeTab === 'total' ? data : monthlyData;
-    const fileName = activeTab === 'total' 
-      ? "total_attendance.csv" 
-      : `attendance_${months[selectedMonth]}_${selectedYear}.csv`;
-    
-    const header = "Name,Roll No,Branch,Total Attendance\n";
-    const rows = exportData.map(
-      (item) => `${item.volName},${item.rollNo},${item.branch},${item.count}`
-    );
-    const csv = header + rows.join("\n");
+    try {
+      const exportData = activeTab === 'total' ? data : monthlyData;
+      const categoryText = activeCategory === 'volunteer' ? 'volunteers' : 'mentors';
+      const fileName = activeTab === 'total' 
+        ? `total_${categoryText}_attendance.csv` 
+        : `${categoryText}_attendance_${months[selectedMonth]}_${selectedYear}.csv`;
+      
+      const header = "Name,Roll No,Branch,Total Attendance\n";
+      const rows = exportData.map(
+        (item) => `${item.volName || item.name},${item.rollNo || ''},${item.branch || ''},${item.count}`
+      );
+      const csv = header + rows.join("\n");
 
-    const fileUri = FileSystem.documentDirectory + fileName;
-    await FileSystem.writeAsStringAsync(fileUri, csv, {
-      encoding: FileSystem.EncodingType.UTF8,
-    });
+      const fileUri = FileSystem.documentDirectory + fileName;
+      await FileSystem.writeAsStringAsync(fileUri, csv, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
 
-    await Sharing.shareAsync(fileUri);
+      await Sharing.shareAsync(fileUri);
+    } catch (err) {
+      setError('Failed to export data. Please try again.');
+    }
   };
 
   const renderItem = ({ item }) => (
     <View style={styles.row}>
-      <Text style={styles.cell}>{item.volName}</Text>
-      <Text style={styles.cell}>{item.rollNo}</Text>
-      <Text style={styles.cell}>{item.branch}</Text>
+      <Text style={styles.cell}>{activeCategory === 'volunteer' ? item.volName : item.name}</Text>
+      <Text style={styles.cell}>{item.rollNo || ''}</Text>
+      <Text style={styles.cell}>{item.branch || ''}</Text>
       <Text style={styles.cell}>{item.count}</Text>
     </View>
   );
@@ -200,9 +223,92 @@ const TotalAttendanceScreen = () => {
     </Modal>
   );
 
+  const renderContent = () => {
+    if (error) {
+      return (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity 
+            style={styles.retryButton}
+            onPress={() => activeTab === 'total' ? fetchData() : fetchMonthlyData()}
+          >
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    if (activeTab === 'total') {
+      if (loading) {
+        return <ActivityIndicator size="large" color="#009688" />;
+      }
+      
+      if (data.length === 0) {
+        return (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyStateText}>
+              No attendance records found
+            </Text>
+          </View>
+        );
+      }
+      
+      return (
+        <FlatList
+          data={data}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={renderItem}
+        />
+      );
+    } else {
+      if (monthlyLoading) {
+        return <ActivityIndicator size="large" color="#009688" />;
+      }
+      
+      if (monthlyData.length === 0) {
+        return (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyStateText}>
+              No attendance records for {months[selectedMonth]} {selectedYear}
+            </Text>
+          </View>
+        );
+      }
+      
+      return (
+        <FlatList
+          data={monthlyData}
+          keyExtractor={(item, index) => `monthly-${index}`}
+          renderItem={renderItem}
+        />
+      );
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Volunteer Attendance</Text>
+      <Text style={styles.title}>Attendance</Text>
+      
+      {/* Category Selector */}
+      <View style={styles.categoryContainer}>
+        <TouchableOpacity 
+          style={[styles.categoryButton, activeCategory === 'volunteer' && styles.activeCategoryButton]}
+          onPress={() => setActiveCategory('volunteer')}
+        >
+          <Text style={[styles.categoryText, activeCategory === 'volunteer' && styles.activeCategoryText]}>
+            Volunteers
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={[styles.categoryButton, activeCategory === 'mentor' && styles.activeCategoryButton]}
+          onPress={() => setActiveCategory('mentor')}
+        >
+          <Text style={[styles.categoryText, activeCategory === 'mentor' && styles.activeCategoryText]}>
+            Mentors
+          </Text>
+        </TouchableOpacity>
+      </View>
       
       {/* Tab Selector */}
       <View style={styles.tabContainer}>
@@ -246,38 +352,11 @@ const TotalAttendanceScreen = () => {
         </Text>
       </View>
 
-      {activeTab === 'total' ? (
-        loading ? (
-          <ActivityIndicator size="large" color="#009688" />
-        ) : (
-          <FlatList
-            data={data}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={renderItem}
-          />
-        )
-      ) : (
-        monthlyLoading ? (
-          <ActivityIndicator size="large" color="#009688" />
-        ) : (
-          <FlatList
-            data={monthlyData}
-            keyExtractor={(item, index) => `monthly-${index}`}
-            renderItem={renderItem}
-            ListEmptyComponent={
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyStateText}>
-                  No attendance records for {months[selectedMonth]} {selectedYear}
-                </Text>
-              </View>
-            }
-          />
-        )
-      )}
+      {renderContent()}
 
       <TouchableOpacity style={styles.exportButton} onPress={exportToCSV}>
         <Text style={styles.exportButtonText}>
-          Export {activeTab === 'total' ? 'Total' : 'Monthly'} as CSV
+          Export {activeCategory === 'volunteer' ? 'Volunteers' : 'Mentors'} {activeTab === 'total' ? 'Total' : 'Monthly'} as CSV
         </Text>
       </TouchableOpacity>
       
@@ -297,6 +376,28 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 16,
     textAlign: "center",
+  },
+  categoryContainer: {
+    flexDirection: "row",
+    marginBottom: 16,
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  categoryButton: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: "center",
+    backgroundColor: "#E5E7EB",
+  },
+  activeCategoryButton: {
+    backgroundColor: "#3B82F6",
+  },
+  categoryText: {
+    fontWeight: "bold",
+    color: "#4B5563",
+  },
+  activeCategoryText: {
+    color: "white",
   },
   tabContainer: {
     flexDirection: "row",
@@ -374,6 +475,25 @@ const styles = StyleSheet.create({
   emptyStateText: {
     color: "#6B7280",
     textAlign: "center",
+  },
+  errorContainer: {
+    padding: 32,
+    alignItems: "center",
+  },
+  errorText: {
+    color: "#EF4444",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: "#3B82F6",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: "white",
+    fontWeight: "bold",
   },
   modalOverlay: {
     flex: 1,

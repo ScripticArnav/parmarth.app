@@ -49,7 +49,7 @@ const MentorScreen = () => {
     }
 
     try {
-      const response = await fetch(`${backendUrl}/mentors/attendanc`, {
+      const response = await fetch(`${backendUrl}/attendance/mentor`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

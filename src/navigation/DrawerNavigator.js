@@ -138,10 +138,9 @@ const CustomDrawerContent = (props) => {
       const response = await fetch(`${backendUrl}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          name, 
-          password: method === "password" ? password : undefined,
-          loginMethod: method 
+        body: JSON.stringify({
+          email,
+          password
         }),
       });
 
@@ -205,8 +204,8 @@ const CustomDrawerContent = (props) => {
             value={password}
             onChangeText={setPassword}
           />
-          <TouchableOpacity 
-            onPress={() => loginHandler("password")} 
+          <TouchableOpacity
+            onPress={() => loginHandler("password")}
             style={styles.authButton}
             disabled={isLoading}
           >
@@ -250,7 +249,7 @@ const CustomDrawerContent = (props) => {
                 onChangeText={setOtp}
                 keyboardType="numeric"
               />
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={handleVerifyOtp}
                 style={styles.authButton}
                 disabled={isLoading}
@@ -265,7 +264,7 @@ const CustomDrawerContent = (props) => {
               </TouchableOpacity>
             </>
           ) : (
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={handleSendOtp}
               style={styles.authButton}
               disabled={isLoading}
@@ -336,7 +335,9 @@ const CustomDrawerContent = (props) => {
           <Text style={styles.username}>PARMARTH IET Lucknow</Text>
           {authCtx.isLoggedIn && authCtx.loginMethod && (
             <Text style={styles.loginMethod}>
-              {authCtx.loginMethod.charAt(0).toUpperCase() + authCtx.loginMethod.slice(1)} Login
+              {authCtx.loginMethod.charAt(0).toUpperCase() +
+                authCtx.loginMethod.slice(1)}{" "}
+              Login
             </Text>
           )}
         </View>
@@ -345,7 +346,10 @@ const CustomDrawerContent = (props) => {
           <>
             <DrawerItemList {...props} />
             <View style={styles.authButtonContainer}>
-              <TouchableOpacity onPress={handleLogout} style={styles.authButton}>
+              <TouchableOpacity
+                onPress={handleLogout}
+                style={styles.authButton}
+              >
                 <Ionicons
                   name="log-out-outline"
                   size={20}
@@ -357,12 +361,10 @@ const CustomDrawerContent = (props) => {
             </View>
           </>
         ) : (
-          <View style={styles.centeredLoginContainer}>
-            {renderLoginForm()}
-          </View>
+          <View style={styles.centeredLoginContainer}>{renderLoginForm()}</View>
         )}
       </BlurView>
-      <Toast 
+      <Toast
         config={{
           success: (props) => (
             <View style={styles.toastContainer}>
@@ -419,33 +421,57 @@ export default function DrawerNavigator() {
       <Drawer.Screen
         name="Mark Volunteers Attendance"
         component={AttendanceScreen}
-        options={{ 
+        options={{
           headerShown: true,
-          drawerItemStyle: { display: (authCtx.loginMethod === "password" || authCtx.loginMethod === "otp") ? "flex" : "none" }
+          drawerItemStyle: {
+            display:
+              authCtx.loginMethod === "password" ||
+              authCtx.loginMethod === "otp"
+                ? "flex"
+                : "none",
+          },
         }}
       />
       <Drawer.Screen
         name="Mark Mentors Attendance"
         component={MentorScreen}
-        options={{ 
+        options={{
           headerShown: true,
-          drawerItemStyle: { display: (authCtx.loginMethod === "password" || authCtx.loginMethod === "otp") ? "flex" : "none" }
+          drawerItemStyle: {
+            display:
+              authCtx.loginMethod === "password" ||
+              authCtx.loginMethod === "otp"
+                ? "flex"
+                : "none",
+          },
         }}
       />
       <Drawer.Screen
         name="Upload Study Materials"
         component={StudyUploadScreen}
-        options={{ 
+        options={{
           headerShown: true,
-          drawerItemStyle: { display: (authCtx.loginMethod === "password" || authCtx.loginMethod === "otp") ? "flex" : "none" }
+          drawerItemStyle: {
+            display:
+              authCtx.loginMethod === "password" ||
+              authCtx.loginMethod === "otp"
+                ? "flex"
+                : "none",
+          },
         }}
       />
       <Drawer.Screen
         name="Upload Events Photos"
         component={EventUploadScreen}
-        options={{ 
+        options={{
           headerShown: true,
-          drawerItemStyle: { display: (authCtx.loginMethod === "password" || authCtx.loginMethod === "otp") ? "flex" : "none" }
+          drawerItemStyle: {
+            display:
+              authCtx.loginMethod === "password" ||
+              authCtx.loginMethod === "otp"
+                ? "flex"
+                : "none",
+          },
         }}
       />
       <Drawer.Screen
@@ -530,11 +556,11 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   toastContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    alignItems: 'center',
+    alignItems: "center",
     zIndex: 1000,
   },
   toast: {
@@ -542,8 +568,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginHorizontal: 16,
     minWidth: 200,
-    maxWidth: '80%',
-    shadowColor: '#000',
+    maxWidth: "80%",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -553,20 +579,20 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   successToast: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
   },
   errorToast: {
-    backgroundColor: '#F44336',
+    backgroundColor: "#F44336",
   },
   toastText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    textAlign: 'center',
-    fontWeight: '500',
+    textAlign: "center",
+    fontWeight: "500",
   },
   loadingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
