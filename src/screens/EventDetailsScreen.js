@@ -10,6 +10,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import ImageViewing from 'react-native-image-viewing';
+import { LinearGradient } from 'expo-linear-gradient';
+import { FontAwesome5 } from '@expo/vector-icons';
 import backendUrl from '../../backendUrl';
 
 export default function EventDetailsScreen({ route }) {
@@ -48,22 +50,40 @@ export default function EventDetailsScreen({ route }) {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>{eventName}</Text>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <LinearGradient
+        colors={['#002855', '#003f88']}
+        style={styles.header}
+      >
+        <FontAwesome5 name="images" size={40} color="#fff" />
+        <Text style={styles.title}>{eventName}</Text>
+        <Text style={styles.subtitle}>Event Gallery</Text>
+      </LinearGradient>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#00695c" />
-      ) : !photos.length ? (
-        <Text style={styles.noPhotos}>No photos uploaded yet.</Text>
-      ) : (
-        <View style={styles.photoGrid}>
-          {photos.map((uri, index) => (
-            <TouchableOpacity key={index} onPress={() => handleImagePress(index)}>
-              <Image source={{ uri }} style={styles.photo} resizeMode="cover" />
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
+      <View style={styles.content}>
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#002855" />
+          </View>
+        ) : !photos.length ? (
+          <View style={styles.noPhotosContainer}>
+            <FontAwesome5 name="image" size={40} color="#002855" style={styles.noPhotosIcon} />
+            <Text style={styles.noPhotos}>No photos uploaded yet.</Text>
+          </View>
+        ) : (
+          <View style={styles.photoGrid}>
+            {photos.map((uri, index) => (
+              <TouchableOpacity 
+                key={index} 
+                onPress={() => handleImagePress(index)}
+                style={styles.photoContainer}
+              >
+                <Image source={{ uri }} style={styles.photo} resizeMode="cover" />
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </View>
 
       <ImageViewing
         images={photos.map((uri) => ({ uri }))}
@@ -84,39 +104,79 @@ const screenWidth = Dimensions.get('window').width;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f9fa',
+  },
+  header: {
+    padding: 30,
+    paddingTop: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
+    color: '#ffffff',
     textAlign: 'center',
-    color: '#6A1B9A',
-    marginBottom: 25,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+    marginTop: 10,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#ffffff',
+    marginTop: 5,
+    opacity: 0.9,
+  },
+  content: {
+    padding: 15,
+    paddingTop: 25,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  noPhotosContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 30,
+  },
+  noPhotosIcon: {
+    marginBottom: 15,
+    opacity: 0.5,
   },
   noPhotos: {
-    textAlign: 'center',
     fontSize: 16,
-    color: '#999',
-    marginTop: 30,
+    color: '#6c757d',
+    textAlign: 'center',
   },
   photoGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  photo: {
+  photoContainer: {
     width: (screenWidth - 48) / 2,
-    height: 160,
-    borderRadius: 12,
     marginBottom: 16,
-    backgroundColor: '#eee',
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: '#fff',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  photo: {
+    width: '100%',
+    height: 160,
+    backgroundColor: '#eee',
   },
 });

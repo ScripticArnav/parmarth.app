@@ -1,8 +1,9 @@
 import React, { useContext } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, StatusBar } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, StatusBar, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AuthContext from "../store/AuthContext";
 import { LinearGradient } from 'expo-linear-gradient';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 const DatabaseScreen = () => {
   const authCtx = useContext(AuthContext);
@@ -13,30 +14,32 @@ const DatabaseScreen = () => {
     navigation.navigate(screenName);
   };
 
-  const CustomButton = ({ title, screenName, bgColor }) => (
+  const CustomButton = ({ title, screenName, icon }) => (
     <TouchableOpacity
       style={styles.buttonContainer}
       onPress={() => handleNavigation(screenName)}
       activeOpacity={0.8}
     >
       <LinearGradient
-        colors={[bgColor, `${bgColor}CC`]}
+        colors={['#002855', '#003f88']}
         style={styles.button}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
       >
-        <Text style={styles.buttonText}>{title}</Text>
+        <View style={styles.buttonContent}>
+          <FontAwesome5 name={icon} size={24} color="#fff" style={styles.buttonIcon} />
+          <Text style={styles.buttonText}>{title}</Text>
+        </View>
       </LinearGradient>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <StatusBar barStyle="light-content" />
       <LinearGradient
-        colors={['#1a237e', '#283593']}
+        colors={['#002855', '#003f88']}
         style={styles.header}
       >
+        <FontAwesome5 name="database" size={40} color="#fff" />
         <Text style={styles.headerTitle}>Database Management</Text>
         <Text style={styles.headerSubtitle}>Manage your Parmarth data efficiently</Text>
       </LinearGradient>
@@ -50,98 +53,107 @@ const DatabaseScreen = () => {
             <CustomButton
               title="View Attendance"
               screenName="ViewAttendanceScreen"
-              bgColor="#4CAF50"
+              icon="clipboard-check"
             />
             <CustomButton
               title="Students in Parmarth"
               screenName="StudentsScreen"
-              bgColor="#2196F3"
+              icon="user-graduate"
             />
             <CustomButton
               title="Admission Data"
               screenName="AdmissionScreen"
-              bgColor="#FF5722"
+              icon="school"
             />
           </View>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#f8f9fa",
   },
   header: {
-    paddingTop: 60,
-    paddingBottom: 30,
-    paddingHorizontal: 20,
+    padding: 30,
+    paddingTop: 50,
+    alignItems: 'center',
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
   },
   headerTitle: {
-    fontSize: 32,
-    fontWeight: "800",
-    color: "#fff",
-    marginBottom: 8,
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 10,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   headerSubtitle: {
     fontSize: 16,
-    color: "#fff",
+    color: '#fff',
+    marginTop: 5,
     opacity: 0.9,
   },
   content: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    padding: 15,
+    paddingTop: 25,
   },
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
+    backgroundColor: '#fff',
+    borderRadius: 16,
     padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "700",
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#002855',
     marginBottom: 8,
-    color: "#1a237e",
-    textAlign: "center",
+    textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 30,
-    textAlign: "center",
+    fontSize: 14,
+    color: '#6c757d',
+    marginBottom: 20,
+    textAlign: 'center',
   },
   buttonsWrapper: {
-    width: "100%",
+    width: '100%',
   },
   buttonContainer: {
-    marginVertical: 8,
-    borderRadius: 15,
+    marginBottom: 12,
+    borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
   },
   button: {
-    paddingVertical: 16,
-    alignItems: "center",
+    padding: 16,
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonIcon: {
+    marginRight: 12,
   },
   buttonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "600",
-    letterSpacing: 0.5,
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

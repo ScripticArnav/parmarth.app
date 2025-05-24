@@ -10,6 +10,8 @@ import {
   Linking,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { LinearGradient } from 'expo-linear-gradient';
+import { FontAwesome5 } from '@expo/vector-icons';
 import backendUrl from '../../backendUrl';
 
 export default function MaterialDetailsScreen({ route }) {
@@ -31,14 +33,14 @@ export default function MaterialDetailsScreen({ route }) {
   ];
 
   const subjectIcons = {
-    HomeWork: '📚',
-    Hindi: '📝',
-    English: '📘',
-    Math: '➗',
-    Science: '🧪',
-    'Social Science': '🌍',
-    GK: '🎯',
-    Computer: '💻',
+    HomeWork: 'book',
+    Hindi: 'pen',
+    English: 'book-open',
+    Math: 'calculator',
+    Science: 'flask',
+    'Social Science': 'globe-asia',
+    GK: 'lightbulb',
+    Computer: 'laptop-code',
   };
 
   useEffect(() => {
@@ -49,7 +51,7 @@ export default function MaterialDetailsScreen({ route }) {
         const data = await response.json();
         setMaterials(data);
       } catch (error) {
-        console.error('❌ Failed to fetch study materials:', error);
+        console.error('Failed to fetch study materials:', error);
       } finally {
         setLoading(false);
       }
@@ -66,38 +68,49 @@ export default function MaterialDetailsScreen({ route }) {
 
   return (
     <>
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Study Material for {className}</Text>
-        <Text style={styles.subtitle}>
-          Yaha {className} ke sabhi subject ke notes, videos, PDFs milenge.
-        </Text>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <LinearGradient
+          colors={['#002855', '#003f88']}
+          style={styles.header}
+        >
+          <FontAwesome5 name="graduation-cap" size={40} color="#fff" />
+          <Text style={styles.headerTitle}>Study Material for {className}</Text>
+          <Text style={styles.headerSubtitle}>Access all study resources for {className}</Text>
+        </LinearGradient>
 
-        {loading ? (
-          <ActivityIndicator size="large" color="#6a1b9a" />
-        ) : materials.length === 0 ? (
-          <Text style={styles.noDataText}>
-            😕 Koi study material uplabdh nahi hai is class ke liye.
-          </Text>
-        ) : (
-          subjects.map((subject) => {
-            const subjectMaterials = getMaterialsForSubject(subject);
-            if (subjectMaterials.length === 0) return null;
+        <View style={styles.content}>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#002855" />
+              <Text style={styles.loadingText}>Loading materials...</Text>
+            </View>
+          ) : materials.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <FontAwesome5 name="folder-open" size={40} color="#6c757d" />
+              <Text style={styles.emptyText}>No study materials available for this class</Text>
+            </View>
+          ) : (
+            subjects.map((subject) => {
+              const subjectMaterials = getMaterialsForSubject(subject);
+              if (subjectMaterials.length === 0) return null;
 
-            return (
-              <View key={subject} style={styles.subjectSection}>
-                <Text style={styles.subjectHeading}>
-                  {subjectIcons[subject] || ''} {subject}
-                </Text>
+              return (
+                <View key={subject} style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <View style={styles.sectionIconContainer}>
+                      <FontAwesome5 name={subjectIcons[subject]} size={20} color="#002855" />
+                    </View>
+                    <Text style={styles.sectionTitle}>{subject}</Text>
+                  </View>
 
-                {subjectMaterials.map((material, idx) => (
-                  <View key={idx} style={styles.materialCard}>
-                    <View style={styles.cardTop}>
-                      <View style={{ flex: 1 }}>
+                  {subjectMaterials.map((material, idx) => (
+                    <View key={idx} style={styles.materialCard}>
+                      <View style={styles.materialInfo}>
                         <Text style={styles.materialTitle}>
                           {material.title || 'Untitled'}
                         </Text>
                         <Text style={styles.materialType}>
-                          📄 {material.type?.toUpperCase() || 'UNKNOWN'}
+                          {material.type?.toUpperCase() || 'UNKNOWN'}
                         </Text>
                       </View>
                       <TouchableOpacity
@@ -105,68 +118,56 @@ export default function MaterialDetailsScreen({ route }) {
                           if (material.fileUrl) {
                             setCurrentUrl(material.fileUrl);
                             setWebViewVisible(true);
-                          } else {
-                            console.warn('❌ No file URL found');
                           }
                         }}
-                        style={styles.downloadButton}
+                        style={styles.openButton}
                       >
-                        <Text style={styles.downloadLink}>📥 Open</Text>
+                        <LinearGradient
+                          colors={['#002855', '#003f88']}
+                          style={styles.buttonGradient}
+                        >
+                          <FontAwesome5 name="file-pdf" size={16} color="#fff" />
+                          <Text style={styles.buttonText}>Open</Text>
+                        </LinearGradient>
                       </TouchableOpacity>
                     </View>
-                  </View>
-                ))}
-              </View>
-            );
-          })
-        )}
+                  ))}
+                </View>
+              );
+            })
+          )}
+        </View>
       </ScrollView>
 
       {/* WebView Modal */}
       <Modal visible={webViewVisible} animationType="slide">
-        <View style={{ flex: 1, backgroundColor: '#f0f0f0' }}>
-          <View
-            style={{
-              backgroundColor: '#6a1b9a',
-              padding: 15,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
+        <View style={styles.modalContainer}>
+          <LinearGradient
+            colors={['#002855', '#003f88']}
+            style={styles.modalHeader}
           >
             <TouchableOpacity
               onPress={() => setWebViewVisible(false)}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingVertical: 5,
-                paddingHorizontal: 10,
-              }}
-              activeOpacity={0.7}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={styles.backButton}
             >
-              <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>❮ Back</Text>
+              <FontAwesome5 name="arrow-left" size={16} color="#fff" />
+              <Text style={styles.backButtonText}>Back</Text>
             </TouchableOpacity>
-            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>PDF Viewer</Text>
+            <Text style={styles.modalTitle}>PDF Viewer</Text>
             <TouchableOpacity
               onPress={() => Linking.openURL(currentUrl)}
-              style={{
-                paddingVertical: 5,
-                paddingHorizontal: 10,
-                backgroundColor: '#4a148c',
-                borderRadius: 6,
-              }}
-              activeOpacity={0.7}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={styles.browserButton}
             >
-              <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>Open in Browser</Text>
+              <FontAwesome5 name="external-link-alt" size={16} color="#fff" />
+              <Text style={styles.browserButtonText}>Open in Browser</Text>
             </TouchableOpacity>
-          </View>
+          </LinearGradient>
+
           <WebView
             source={{
               uri: `https://docs.google.com/viewer?url=${encodeURIComponent(currentUrl)}&embedded=true`,
             }}
-            style={{ flex: 1 }}
+            style={styles.webview}
             javaScriptEnabled={true}
             domStorageEnabled={true}
             startInLoadingState={true}
@@ -225,9 +226,9 @@ export default function MaterialDetailsScreen({ route }) {
               true;
             `}
             renderLoading={() => (
-              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9f9f9' }}>
-                <ActivityIndicator size="large" color="#6a1b9a" />
-                <Text style={{ marginTop: 15, color: '#333', fontSize: 16 }}>Loading PDF...</Text>
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#002855" />
+                <Text style={styles.loadingText}>Loading PDF...</Text>
               </View>
             )}
           />
@@ -239,86 +240,160 @@ export default function MaterialDetailsScreen({ route }) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: '#f9f9f9',
+    flex: 1,
+    backgroundColor: '#f8f9fa',
   },
-  title: {
-    fontSize: 24,
+  header: {
+    padding: 30,
+    paddingTop: 50,
+    alignItems: 'center',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+  },
+  headerTitle: {
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#4A148C',
-    textAlign: 'center',
-    marginBottom: 6,
+    color: '#fff',
+    marginTop: 10,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
-  subtitle: {
-    fontSize: 15,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  noDataText: {
+  headerSubtitle: {
     fontSize: 16,
-    color: '#888',
+    color: '#fff',
+    marginTop: 5,
+    opacity: 0.9,
+  },
+  content: {
+    padding: 15,
+    paddingTop: 25,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#002855',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+  },
+  emptyText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#6c757d',
     textAlign: 'center',
-    marginTop: 40,
   },
-  subjectSection: {
-    marginBottom: 30,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 12,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
+  section: {
+    marginBottom: 24,
   },
-  subjectHeading: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#6a1b9a',
-    marginBottom: 10,
-    borderBottomWidth: 1.2,
-    borderColor: '#e0e0e0',
-    paddingBottom: 6,
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f8f9fa',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#002855',
   },
   materialCard: {
-    backgroundColor: '#f3f0f9',
-    padding: 14,
-    marginBottom: 10,
-    borderRadius: 10,
-    elevation: 2,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    elevation: 3,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 3,
-    borderLeftWidth: 5,
-    borderLeftColor: '#6a1b9a',
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+  },
+  materialInfo: {
+    flex: 1,
   },
   materialTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#2C3E50',
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2c3e50',
     marginBottom: 4,
   },
   materialType: {
-    fontSize: 13,
-    fontStyle: 'italic',
-    color: '#555',
+    fontSize: 12,
+    color: '#6c757d',
   },
-  downloadButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    backgroundColor: '#8e44ad',
-    borderRadius: 6,
+  openButton: {
+    marginTop: 12,
+    borderRadius: 12,
+    overflow: 'hidden',
   },
-  downloadLink: {
+  buttonGradient: {
+    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  buttonText: {
+    color: '#fff',
     fontSize: 14,
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
-  cardTop: {
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  modalHeader: {
+    padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  browserButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  browserButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  webview: {
+    flex: 1,
   },
 });

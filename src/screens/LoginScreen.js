@@ -10,6 +10,7 @@ import {
   Alert,
 } from "react-native";
 import { Feather, FontAwesome5 } from "@expo/vector-icons";
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get("window");
 
@@ -76,9 +77,12 @@ const impactData = [
 
 const HomeScreen = () => {
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
-      <View style={styles.header}>
+      <LinearGradient
+        colors={['#002855', '#003f88']}
+        style={styles.header}
+      >
         <Image
           source={require("../../assets/icon.png")}
           style={styles.logo}
@@ -86,71 +90,102 @@ const HomeScreen = () => {
         />
         <Text style={styles.title}>PARMARTH</Text>
         <Text style={styles.subtitle}>The Social Club of IET Lucknow</Text>
-      </View>
+      </LinearGradient>
 
       {/* Blood Donation Box */}
       <View style={styles.bannerBox}>
-        <Text style={styles.bannerTitle}>Blood Donation Drive</Text>
-        <Text style={styles.bannerDate}>21 MAY</Text>
+        <LinearGradient
+          colors={['#ff4b4b', '#ff6b6b']}
+          style={styles.bannerGradient}
+        >
+          <View style={styles.bannerContent}>
+            <View>
+              <Text style={styles.bannerTitle}>Blood Donation Drive</Text>
+              <Text style={styles.bannerDate}>21 MAY</Text>
+            </View>
+            <FontAwesome5 name="heartbeat" size={32} color="#fff" />
+          </View>
+        </LinearGradient>
       </View>
 
       {/* Menu Options */}
-      <View style={styles.menuRow}>
+      <View style={styles.menuContainer}>
         <TouchableOpacity onPress={() => navigateTo("Events")}>
           <View style={styles.menuItem}>
-            <Feather name="calendar" size={24} color="#002855" />
-            <Text>Events</Text>
+            <View style={styles.menuIconContainer}>
+              <Feather name="calendar" size={24} color="#fff" />
+            </View>
+            <Text style={styles.menuLabel}>Events</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigateTo("Volunteer")}>
           <View style={styles.menuItem}>
-            <FontAwesome5 name="handshake" size={24} color="#002855" />
-            <Text>Volunteer Now</Text>
+            <View style={styles.menuIconContainer}>
+              <FontAwesome5 name="handshake" size={24} color="#fff" />
+            </View>
+            <Text style={styles.menuLabel}>Volunteer</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigateTo("Gallery")}>
           <View style={styles.menuItem}>
-            <Feather name="image" size={24} color="#002855" />
-            <Text>Gallery</Text>
+            <View style={styles.menuIconContainer}>
+              <Feather name="image" size={24} color="#fff" />
+            </View>
+            <Text style={styles.menuLabel}>Gallery</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigateTo("About")}>
           <View style={styles.menuItem}>
-            <Feather name="info" size={24} color="#002855" />
-            <Text>About Parmarth</Text>
+            <View style={styles.menuIconContainer}>
+              <Feather name="info" size={24} color="#fff" />
+            </View>
+            <Text style={styles.menuLabel}>About</Text>
           </View>
         </TouchableOpacity>
       </View>
 
       {/* Live Updates */}
-      <Text style={styles.sectionTitle}>LIVE UPDATES</Text>
-      {liveUpdates.map((update, index) => (
-        <View key={index} style={styles.liveUpdateBox}>
-          <View style={styles.dot} />
-          <Text style={styles.liveText}>{update}</Text>
-        </View>
-      ))}
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionTitle}>LIVE UPDATES</Text>
+        {liveUpdates.map((update, index) => (
+          <View key={index} style={styles.liveUpdateBox}>
+            <View style={styles.dot} />
+            <Text style={styles.liveText}>{update}</Text>
+          </View>
+        ))}
+      </View>
 
       {/* Join Us Button */}
       <TouchableOpacity
         style={styles.joinButton}
         onPress={() => navigateTo("Join Us")}
       >
-        <Text style={styles.joinText}>Join Us</Text>
+        <LinearGradient
+          colors={['#002855', '#003f88']}
+          style={styles.joinButtonGradient}
+        >
+          <Text style={styles.joinText}>Join Us</Text>
+        </LinearGradient>
       </TouchableOpacity>
 
       {/* Featured Stories */}
-      <Text style={styles.sectionTitle}>FEATURED STORIES</Text>
-      <View style={styles.featureRow}>
-        <View style={styles.featureBox}>
-          <FontAwesome5 name="hand-holding-heart" size={32} color="#002855" />
-          <Text style={styles.featureTitle}>500+</Text>
-          <Text style={styles.featureDesc}>lives impacted</Text>
-        </View>
-        <View style={styles.featureBox}>
-          <FontAwesome5 name="seedling" size={32} color="#002855" />
-          <Text style={styles.featureTitle}>1000+</Text>
-          <Text style={styles.featureDesc}>trees planted</Text>
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionTitle}>FEATURED STORIES</Text>
+        <View style={styles.featureRow}>
+          <View style={styles.featureBox}>
+            <View style={styles.featureIconContainer}>
+              <FontAwesome5 name="hand-holding-heart" size={32} color="#fff" />
+            </View>
+            <Text style={styles.featureTitle}>500+</Text>
+            <Text style={styles.featureDesc}>lives impacted</Text>
+          </View>
+          <View style={styles.featureBox}>
+            <View style={styles.featureIconContainer}>
+              <FontAwesome5 name="seedling" size={32} color="#fff" />
+            </View>
+            <Text style={styles.featureTitle}>1000+</Text>
+            <Text style={styles.featureDesc}>trees planted</Text>
+          </View>
         </View>
       </View>
 
@@ -158,33 +193,16 @@ const HomeScreen = () => {
       <View style={styles.statsSection}>
         <Text style={styles.statsTitle}>Our Impact</Text>
         <View style={styles.statsContainer}>
-          {impactData
-            .reduce((rows, item, index) => {
-              if (index % 2 === 0) {
-                rows.push([item]);
-              } else {
-                rows[rows.length - 1].push(item);
-              }
-              return rows;
-            }, [])
-            .map((row, rowIndex) => (
-              <View key={rowIndex} style={styles.statsRow}>
-                {row.map((item) => (
-                  <View key={item.title} style={styles.statCard}>
-                    <Counter end={item.count} />
-                    <Text style={styles.statTitle}>{item.title}</Text>
-                    <Text style={styles.statDescription}>
-                      {item.description}
-                    </Text>
-                  </View>
-                ))}
-                {row.length === 1 && (
-                  <View
-                    style={[styles.statCard, { backgroundColor: "transparent" }]}
-                  />
-                )}
+          {impactData.map((item, index) => (
+            <View key={item.title} style={styles.statCard}>
+              <View style={styles.statIconContainer}>
+                <FontAwesome5 name={item.icon} size={24} color="#002855" />
               </View>
-            ))}
+              <Counter end={item.count} />
+              <Text style={styles.statTitle}>{item.title}</Text>
+              <Text style={styles.statDescription}>{item.description}</Text>
+            </View>
+          ))}
         </View>
       </View>
     </ScrollView>
@@ -192,105 +210,234 @@ const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  header: { alignItems: "center", padding: 16 },
-  title: { fontSize: 24, fontWeight: "bold", color: "#002855", marginTop: 4 },
-  subtitle: { fontSize: 14, color: "#444" },
-  bannerBox: {
-    backgroundColor: "#002855",
-    borderRadius: 12,
-    padding: 16,
-    margin: 16,
+  container: {
+    flex: 1,
+    backgroundColor: "#f8f9fa",
   },
-  bannerTitle: { fontSize: 20, color: "#fff", fontWeight: "bold" },
-  bannerDate: { fontSize: 16, color: "#fff", marginTop: 4 },
-  menuRow: {
+  header: {
+    padding: 20,
+    paddingTop: 40,
+    alignItems: "center",
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    marginBottom: 12,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#fff",
+    marginTop: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#fff",
+    opacity: 0.9,
+  },
+  bannerBox: {
+    margin: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  bannerGradient: {
+    padding: 20,
+  },
+  bannerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  bannerTitle: {
+    fontSize: 22,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  bannerDate: {
+    fontSize: 18,
+    color: "#fff",
+    marginTop: 4,
+  },
+  menuContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    paddingVertical: 16,
+    paddingVertical: 20,
+    backgroundColor: "#fff",
+    marginHorizontal: 16,
+    borderRadius: 16,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
   },
-  menuItem: { alignItems: "center", width: width / 4 },
+  menuItem: {
+    alignItems: "center",
+  },
+  menuIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#002855",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
+  },
+  menuLabel: {
+    fontSize: 12,
+    color: "#2c3e50",
+    textAlign: "center",
+  },
+  sectionContainer: {
+    marginTop: 24,
+    marginHorizontal: 16,
+  },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
-    marginLeft: 16,
-    marginTop: 16,
+    color: "#002855",
+    marginBottom: 16,
   },
   liveUpdateBox: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
-    marginHorizontal: 16,
-    marginTop: 8,
-    padding: 12,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   dot: {
     width: 8,
     height: 8,
-    backgroundColor: "green",
+    backgroundColor: "#4CAF50",
     borderRadius: 4,
-    marginRight: 8,
+    marginRight: 12,
   },
-  liveText: { fontSize: 14 },
+  liveText: {
+    fontSize: 14,
+    color: "#2c3e50",
+    flex: 1,
+  },
   joinButton: {
-    backgroundColor: "#003f88",
-    marginHorizontal: 16,
-    borderRadius: 8,
-    padding: 14,
-    alignItems: "center",
-    marginTop: 16,
+    margin: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
-  joinText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  joinButtonGradient: {
+    padding: 16,
+    alignItems: "center",
+  },
+  joinText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
   featureRow: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: 16,
+    justifyContent: "space-between",
+  },
+  featureBox: {
+    flex: 1,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 8,
+    alignItems: "center",
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+  },
+  featureIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "#002855",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  featureTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#002855",
+    marginBottom: 4,
+  },
+  featureDesc: {
+    fontSize: 14,
+    color: "#6c757d",
+  },
+  statsSection: {
+    marginTop: 24,
+    marginHorizontal: 16,
     marginBottom: 32,
   },
-  featureBox: { alignItems: "center" },
-  featureTitle: { fontSize: 20, fontWeight: "bold", marginTop: 8 },
-  featureDesc: { fontSize: 14, color: "#444" },
-  statsSection: { marginBottom: 32 },
   statsTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginLeft: 16,
-    marginBottom: 8,
+    color: "#002855",
+    marginBottom: 16,
   },
   statsContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 24,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   statCard: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
-    padding: 12,
-    marginHorizontal: 4,
-    minHeight: 120,
+    width: "48%",
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
   },
-  statsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  statIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#f8f9fa",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 12,
   },
-  statNumber: { fontSize: 24, fontWeight: "bold", color: "#002855" },
-  statTitle: {
-    fontSize: 16,
+  statNumber: {
+    fontSize: 24,
     fontWeight: "bold",
-    marginTop: 8,
     color: "#002855",
+    marginBottom: 4,
+  },
+  statTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#002855",
+    marginBottom: 4,
   },
   statDescription: {
-    fontSize: 13,
-    color: "#333",
-    marginTop: 4,
-  },
-  logo: {
-    width: 50,
-    height: 50,
-    marginBottom: 8,
+    fontSize: 12,
+    color: "#6c757d",
+    lineHeight: 16,
   },
 });
 
