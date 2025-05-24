@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CommonActions } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 let logoutTimer;
+let navigationRef;
+
+export const setNavigationRef = (ref) => {
+  navigationRef = ref;
+};
 
 const AuthContext = React.createContext({
   token: "",
@@ -25,8 +32,8 @@ const retrieveStoredToken = async () => {
 
   const remainingTime = calculateRemainingTime(storedExpirationDate);
 
-  if (remainingTime <= 3600) {
-    await AsyncStorage.multiRemove(["token", "expirationTime", "loginMethod"]);
+  if (remainingTime <= 0) {
+    await AsyncStorage.multiRemove(["token", "expirationTime", "loginMethod", "userId"]);
     return null;
   }
 
@@ -45,9 +52,41 @@ export const AuthContextProvider = (props) => {
   const logoutHandler = useCallback(async () => {
     setToken(null);
     setLoginMethod("");
-    await AsyncStorage.multiRemove(["token", "expirationTime", "loginMethod"]);
+    await AsyncStorage.multiRemove(["token", "expirationTime", "loginMethod", "userId"]);
     if (logoutTimer) {
       clearTimeout(logoutTimer);
+    }
+
+    // Force navigation to Home screen
+    if (navigationRef) {
+      navigationRef.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [
+            {
+              name: 'Main',
+              state: {
+                routes: [
+                  {
+                    name: 'Home',
+                    params: { timestamp: Date.now() }
+                  }
+                ]
+              }
+            }
+          ]
+        })
+      );
+
+      // Show toast after navigation
+      setTimeout(() => {
+        Toast.show({
+          type: "error",
+          text1: "You are logged out, Thank you",
+          position: "top",
+          visibilityTime: 3000,
+        });
+      }, 1000);
     }
   }, []);
 
@@ -64,8 +103,28 @@ export const AuthContextProvider = (props) => {
     await AsyncStorage.setItem("loginMethod", loginMethod);
 
     const remainingTime = calculateRemainingTime(expirationTime);
+    if (logoutTimer) {
+      clearTimeout(logoutTimer);
+    }
     logoutTimer = setTimeout(logoutHandler, remainingTime);
   };
+
+  // Add session check interval
+  useEffect(() => {
+    const checkSession = async () => {
+      const tokenData = await retrieveStoredToken();
+      if (!tokenData) {
+        logoutHandler();
+      }
+    };
+
+    // Check session every 45 minutes
+    const sessionCheckInterval = setInterval(checkSession, 45 * 60 * 1000);
+
+    return () => {
+      clearInterval(sessionCheckInterval);
+    };
+  }, [logoutHandler]);
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -74,6 +133,9 @@ export const AuthContextProvider = (props) => {
       if (tokenData) {
         setToken(tokenData.token);
         setLoginMethod(tokenData.loginMethod);
+        if (logoutTimer) {
+          clearTimeout(logoutTimer);
+        }
         logoutTimer = setTimeout(logoutHandler, tokenData.duration);
       }
     };

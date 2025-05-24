@@ -1,4 +1,4 @@
-import { memo, useContext, useState } from "react";
+import { memo, useContext, useState, useEffect } from "react";
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -19,6 +19,7 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   interpolate,
+  withTiming,
 } from "react-native-reanimated";
 import Toast from "react-native-toast-message";
 
@@ -44,6 +45,24 @@ const CustomDrawerContent = (props) => {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Reset all states when auth state changes
+  useEffect(() => {
+    if (!authCtx.isLoggedIn) {
+      setShowPasswordLogin(false);
+      setShowOtpLogin(false);
+      setOtpSent(false);
+      setOtp("");
+      setName("");
+      setEmail("");
+      setPassword("");
+      props.navigation.closeDrawer();
+      props.navigation.reset({
+        index: 0,
+        routes: [{ name: 'Main' }],
+      });
+    }
+  }, [authCtx.isLoggedIn]);
 
   const isEmailValid = (email) =>
     /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
@@ -92,9 +111,9 @@ const CustomDrawerContent = (props) => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Invalid OTP");
 
-      // Set expiration time to 10 minutes from now for OTP login
+      // Set expiration time to 1 minute from now for OTP login
       const expirationTime = new Date();
-      expirationTime.setMinutes(expirationTime.getMinutes() + 10);
+      expirationTime.setMinutes(expirationTime.getMinutes() + 1);
 
       authCtx.login(
         data.token,
@@ -150,9 +169,9 @@ const CustomDrawerContent = (props) => {
       } else if (resData.token) {
         const expirationTime = new Date();
         if (method === "password") {
-          expirationTime.setHours(expirationTime.getHours() + 1); // 1 hour for password login
+          expirationTime.setMinutes(expirationTime.getMinutes() + 5); // 5 minutes for password login
         } else {
-          expirationTime.setMinutes(expirationTime.getMinutes() + 10); // 10 minutes for OTP
+          expirationTime.setMinutes(expirationTime.getMinutes() + 1); // 1 minute for OTP
         }
 
         authCtx.login(
@@ -181,7 +200,6 @@ const CustomDrawerContent = (props) => {
 
   const handleLogout = () => {
     authCtx.logout();
-    props.navigation.closeDrawer();
   };
 
   const renderLoginForm = () => {
@@ -363,24 +381,6 @@ const CustomDrawerContent = (props) => {
           <View style={styles.centeredLoginContainer}>{renderLoginForm()}</View>
         )}
       </BlurView>
-      <Toast
-        config={{
-          success: (props) => (
-            <View style={styles.toastContainer}>
-              <View style={[styles.toast, styles.successToast]}>
-                <Text style={styles.toastText}>{props.text1}</Text>
-              </View>
-            </View>
-          ),
-          error: (props) => (
-            <View style={styles.toastContainer}>
-              <View style={[styles.toast, styles.errorToast]}>
-                <Text style={styles.toastText}>{props.text1}</Text>
-              </View>
-            </View>
-          ),
-        }}
-      />
     </DrawerContentScrollView>
   );
 };
@@ -401,6 +401,7 @@ export default function DrawerNavigator() {
 
   return (
     <Drawer.Navigator
+      key={authCtx.isLoggedIn ? 'logged-in' : 'logged-out'}
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
         drawerType: "slide",
@@ -408,6 +409,21 @@ export default function DrawerNavigator() {
         drawerStyle: styles.drawerStyle,
         sceneContainerStyle: { backgroundColor: "transparent" },
         headerShown: false,
+        headerRight: () => (
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 16 }}>
+            <Image
+              source={require('../../assets/logo.jpg')}
+              style={{
+                width: 50,
+                height: 50,
+                marginRight: 10,
+                borderWidth: 0.8,
+                borderRadius: 18,
+              }}
+              resizeMode="contain"
+            />
+          </View>
+        ),
       }}
     >
       <Drawer.Screen name="Main">
