@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
-import { Card } from 'react-native-paper';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useRoute } from '@react-navigation/native';
 import backendUrl from '../../backendUrl';
 
@@ -27,106 +28,173 @@ const RTEYearScreen = () => {
   }, [academicYear]);
 
   const renderStudent = ({ item, index }) => (
-    <Card style={styles.card} elevation={5}>
+    <View style={styles.card}>
+      <View style={styles.cardHeader}>
+        <View style={styles.cardIconContainer}>
+          <FontAwesome5 name="user-graduate" size={20} color="#002855" />
+        </View>
+        <Text style={styles.serialNumber}>{item.studentName}</Text>
+      </View>
       <View style={styles.cardContent}>
-        <Text style={styles.serialNumber}>{index + 1}</Text>
-        <View style={styles.details}>
-          <Text style={styles.name}>{item.studentName}</Text>
-          <Text style={styles.info}><Text style={styles.label}>Class:</Text> {item.classStudying}</Text>
-          <Text style={styles.info}><Text style={styles.label}>School:</Text> {item.school}</Text>
+        <View style={styles.infoRow}>
+          <FontAwesome5 name="graduation-cap" size={14} color="#6c757d" />
+          <Text style={styles.info}>
+            <Text style={styles.label}>Class:</Text> {item.classStudying}
+          </Text>
+        </View>
+        <View style={styles.infoRow}>
+          <FontAwesome5 name="school" size={14} color="#6c757d" />
+          <Text style={styles.info}>
+            <Text style={styles.label}>School:</Text> {item.school}
+          </Text>
         </View>
       </View>
-    </Card>
+    </View>
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>RTE Admissions in {academicYear}</Text>
-      <Text style={styles.total}>Total Entries: {students.length}</Text>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <LinearGradient
+        colors={['#002855', '#003f88']}
+        style={styles.header}
+      >
+        <FontAwesome5 name="school" size={40} color="#fff" />
+        <Text style={styles.headerTitle}>RTE Admissions {academicYear}</Text>
+        <Text style={styles.headerSubtitle}>Total Entries: {students.length}</Text>
+      </LinearGradient>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#4a90e2" />
-      ) : students.length === 0 ? (
-        <Text style={styles.noData}>No students found for this year</Text>
-      ) : (
-        <FlatList
-          data={students}
-          keyExtractor={(item) => item._id}
-          renderItem={renderStudent}
-          contentContainerStyle={{ paddingBottom: 30 }}
-        />
-      )}
-    </View>
+      <View style={styles.content}>
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#002855" />
+            <Text style={styles.loadingText}>Loading students...</Text>
+          </View>
+        ) : students.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <FontAwesome5 name="user-slash" size={40} color="#6c757d" />
+            <Text style={styles.emptyText}>No students found for this year</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={students}
+            keyExtractor={(item) => item._id}
+            renderItem={renderStudent}
+            contentContainerStyle={styles.list}
+            scrollEnabled={false}
+          />
+        )}
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e6f0ff',
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    backgroundColor: '#f8f9fa',
   },
-  title: {
-    fontSize: 26,
-    fontWeight: '700',
-    marginBottom: 6,
-    color: '#2c3e50',
-    textAlign: 'center',
+  header: {
+    padding: 30,
+    paddingTop: 50,
+    alignItems: 'center',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
-  total: {
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 10,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+  },
+  headerSubtitle: {
     fontSize: 16,
-    marginBottom: 14,
-    color: '#34495e',
+    color: '#fff',
+    marginTop: 5,
+    opacity: 0.9,
+  },
+  content: {
+    padding: 15,
+    paddingTop: 25,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#002855',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+  },
+  emptyText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#6c757d',
     textAlign: 'center',
+  },
+  list: {
+    paddingBottom: 20,
   },
   card: {
     backgroundColor: '#fff',
-    borderRadius: 12,
-    marginBottom: 14,
-    shadowColor: '#34495e',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 6,
+    borderRadius: 16,
     padding: 16,
+    marginBottom: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
   },
-  cardContent: {
+  cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 12,
+  },
+  cardIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f8f9fa',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
   },
   serialNumber: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#4a90e2',
-    width: 40,
-    textAlign: 'center',
-    marginRight: 16,
+    color: '#002855',
   },
-  details: {
-    flex: 1,
+  cardContent: {
+    gap: 8,
   },
   name: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#2c3e50',
-    marginBottom: 6,
+    fontWeight: 'bold',
+    color: '#002855',
+    marginBottom: 4,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   info: {
-    fontSize: 15,
-    color: '#7f8c8d',
-    marginBottom: 2,
+    fontSize: 14,
+    color: '#6c757d',
   },
   label: {
     fontWeight: '600',
-    color: '#34495e',
-  },
-  noData: {
-    fontSize: 18,
-    color: '#95a5a6',
-    marginTop: 40,
-    textAlign: 'center',
-    fontStyle: 'italic',
+    color: '#2c3e50',
   },
 });
 

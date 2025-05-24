@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
+import { LinearGradient } from 'expo-linear-gradient';
+import { FontAwesome5 } from '@expo/vector-icons';
 import backendUrl from "../../backendUrl";
 
 const events = [
@@ -93,116 +95,231 @@ export default function EventPhotoUploadScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>📸 Upload Event Photos</Text>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <LinearGradient
+        colors={['#002855', '#003f88']}
+        style={styles.header}
+      >
+        <FontAwesome5 name="camera" size={40} color="#fff" />
+        <Text style={styles.headerTitle}>Upload Event Photos</Text>
+        <Text style={styles.headerSubtitle}>Share your event memories</Text>
+      </LinearGradient>
 
-      <Text style={styles.label}>Select Event</Text>
-      <View style={styles.pickerWrapper}>
-        <Picker selectedValue={selectedEvent} onValueChange={setSelectedEvent}>
-          <Picker.Item label="Select Event" value="" />
-          {events.map((evt) => (
-            <Picker.Item label={evt} value={evt} key={evt} />
-          ))}
-        </Picker>
+      <View style={styles.content}>
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionIconContainer}>
+              <FontAwesome5 name="calendar-alt" size={20} color="#002855" />
+            </View>
+            <Text style={styles.sectionTitle}>Select Event</Text>
+          </View>
+
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={selectedEvent}
+              onValueChange={setSelectedEvent}
+              style={styles.picker}
+            >
+              <Picker.Item label="Select Event" value="" />
+              {events.map((evt) => (
+                <Picker.Item label={evt} value={evt} key={evt} />
+              ))}
+            </Picker>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionIconContainer}>
+              <FontAwesome5 name="images" size={20} color="#002855" />
+            </View>
+            <Text style={styles.sectionTitle}>Event Photos</Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={pickImages}
+            disabled={photos.length >= 7}
+          >
+            <LinearGradient
+              colors={photos.length >= 7 ? ['#6c757d', '#6c757d'] : ['#002855', '#003f88']}
+              style={styles.buttonGradient}
+            >
+              <FontAwesome5 name="plus" size={16} color="#fff" />
+              <Text style={styles.buttonText}>
+                {photos.length >= 7
+                  ? "Max 7 Photos Added"
+                  : `Pick Photos (${photos.length}/7)`}
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <ScrollView horizontal style={styles.photoScroll} showsHorizontalScrollIndicator={false}>
+            {photos.map((img, idx) => (
+              <View key={idx} style={styles.photoContainer}>
+                <Image source={{ uri: img.uri }} style={styles.photo} />
+                <TouchableOpacity
+                  style={styles.removePhotoButton}
+                  onPress={() => {
+                    setPhotos(photos.filter((_, i) => i !== idx));
+                  }}
+                >
+                  <FontAwesome5 name="times" size={16} color="#fff" />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+
+        <TouchableOpacity
+          style={styles.submitButton}
+          onPress={handleUpload}
+          disabled={loading}
+        >
+          <LinearGradient
+            colors={['#002855', '#003f88']}
+            style={styles.buttonGradient}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <>
+                <FontAwesome5 name="cloud-upload-alt" size={16} color="#fff" />
+                <Text style={styles.buttonText}>Upload Photos</Text>
+              </>
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity
-        style={styles.pickBtn}
-        onPress={pickImages}
-        disabled={photos.length >= 7}
-      >
-        <Text style={styles.pickBtnText}>
-          {photos.length >= 7
-            ? "📷 Max 7 Photos Added"
-            : `📷 Pick Photos (${photos.length}/7)`}
-        </Text>
-      </TouchableOpacity>
-
-      <ScrollView horizontal style={styles.previewScroll}>
-        {photos.map((img, idx) => (
-          <Image
-            key={idx}
-            source={{ uri: img.uri }}
-            style={styles.previewImage}
-          />
-        ))}
-      </ScrollView>
-
-      <TouchableOpacity
-        style={[styles.uploadBtn, loading && { opacity: 0.6 }]}
-        onPress={handleUpload}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.uploadBtnText}>⬆️ Upload Photos</Text>
-        )}
-      </TouchableOpacity>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    paddingBottom: 40,
-    backgroundColor: "#FAFAFA",
+    flex: 1,
+    backgroundColor: '#f8f9fa',
   },
   header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#880E4F",
-    textAlign: "center",
-    marginBottom: 25,
+    padding: 30,
+    paddingTop: 50,
+    alignItems: 'center',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 6,
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
     marginTop: 10,
-    color: "#333",
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
-  pickerWrapper: {
-    borderWidth: 1,
-    borderColor: "#F06292",
-    borderRadius: 10,
-    marginBottom: 15,
-    backgroundColor: "#fff",
-    overflow: "hidden",
-  },
-  pickBtn: {
-    backgroundColor: "#D81B60",
-    padding: 12,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  pickBtnText: {
-    color: "#fff",
-    fontWeight: "600",
+  headerSubtitle: {
     fontSize: 16,
+    color: '#fff',
+    marginTop: 5,
+    opacity: 0.9,
   },
-  previewScroll: {
-    marginTop: 15,
-    marginBottom: 10,
-  },
-  previewImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    marginRight: 10,
-  },
-  uploadBtn: {
-    backgroundColor: "#880E4F",
+  content: {
     padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 20,
+    paddingTop: 25,
   },
-  uploadBtnText: {
-    color: "#fff",
-    fontWeight: "700",
+  section: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f8f9fa',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#002855',
+  },
+  pickerContainer: {
+    backgroundColor: '#f8f9fa',
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    borderRadius: 12,
+    marginBottom: 12,
+    overflow: 'hidden',
+  },
+  picker: {
+    height: 50,
+    color: '#2c3e50',
+  },
+  addButton: {
+    marginBottom: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+  },
+  buttonGradient: {
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  buttonText: {
+    color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  photoScroll: {
+    marginTop: 16,
+  },
+  photoContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 12,
+    marginRight: 12,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+  },
+  photo: {
+    width: '100%',
+    height: '100%',
+  },
+  removePhotoButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  submitButton: {
+    marginBottom: 50,
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
   },
 });

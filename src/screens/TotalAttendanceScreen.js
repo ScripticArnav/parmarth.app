@@ -13,6 +13,8 @@ import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import backendUrl from "../../backendUrl";
 import AuthContext from "../store/AuthContext";
+import { LinearGradient } from 'expo-linear-gradient';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 const TotalAttendanceScreen = () => {
   const authCtx = useContext(AuthContext);
@@ -287,79 +289,119 @@ const TotalAttendanceScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Attendance</Text>
-      
-      {/* Category Selector */}
-      <View style={styles.categoryContainer}>
-        <TouchableOpacity 
-          style={[styles.categoryButton, activeCategory === 'volunteer' && styles.activeCategoryButton]}
-          onPress={() => setActiveCategory('volunteer')}
-        >
-          <Text style={[styles.categoryText, activeCategory === 'volunteer' && styles.activeCategoryText]}>
-            Volunteers
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={[styles.categoryButton, activeCategory === 'mentor' && styles.activeCategoryButton]}
-          onPress={() => setActiveCategory('mentor')}
-        >
-          <Text style={[styles.categoryText, activeCategory === 'mentor' && styles.activeCategoryText]}>
-            Mentors
-          </Text>
-        </TouchableOpacity>
-      </View>
-      
-      {/* Tab Selector */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity 
-          style={[styles.tab, activeTab === 'total' && styles.activeTab]}
-          onPress={() => setActiveTab('total')}
-        >
-          <Text style={[styles.tabText, activeTab === 'total' && styles.activeTabText]}>
-            Total
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={[styles.tab, activeTab === 'monthly' && styles.activeTab]}
-          onPress={() => setActiveTab('monthly')}
-        >
-          <Text style={[styles.tabText, activeTab === 'monthly' && styles.activeTabText]}>
-            Monthly
-          </Text>
-        </TouchableOpacity>
-      </View>
-      
-      {/* Month selector for monthly tab */}
-      {activeTab === 'monthly' && (
-        <TouchableOpacity 
-          style={styles.monthSelector}
-          onPress={() => setMonthPickerVisible(true)}
-        >
-          <Text style={styles.monthSelectorText}>
-            {months[selectedMonth]} {selectedYear} ▼
-          </Text>
-        </TouchableOpacity>
-      )}
+      <LinearGradient
+        colors={['#002855', '#003f88']}
+        style={styles.header}
+      >
+        <FontAwesome5 name="chart-bar" size={40} color="#fff" />
+        <Text style={styles.headerTitle}>Total Attendance</Text>
+        <Text style={styles.headerSubtitle}>View attendance statistics</Text>
+      </LinearGradient>
 
-      <View style={styles.tableHeader}>
-        <Text style={[styles.cell, styles.headerCell]}>Name</Text>
-        <Text style={[styles.cell, styles.headerCell]}>Roll No</Text>
-        <Text style={[styles.cell, styles.headerCell]}>Branch</Text>
-        <Text style={[styles.cell, styles.headerCell]}>
-          {activeTab === 'total' ? 'Total' : 'Days'}
-        </Text>
+      <View style={styles.content}>
+        {/* Tabs */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'total' && styles.activeTab]}
+            onPress={() => setActiveTab('total')}
+          >
+            <LinearGradient
+              colors={activeTab === 'total' ? ['#002855', '#003f88'] : ['#f8f9fa', '#f8f9fa']}
+              style={styles.tabGradient}
+            >
+              <Text style={[styles.tabText, activeTab === 'total' && styles.activeTabText]}>
+                Total Attendance
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'monthly' && styles.activeTab]}
+            onPress={() => setActiveTab('monthly')}
+          >
+            <LinearGradient
+              colors={activeTab === 'monthly' ? ['#002855', '#003f88'] : ['#f8f9fa', '#f8f9fa']}
+              style={styles.tabGradient}
+            >
+              <Text style={[styles.tabText, activeTab === 'monthly' && styles.activeTabText]}>
+                Monthly Attendance
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
+        {/* Category Toggle */}
+        <View style={styles.categoryContainer}>
+          <TouchableOpacity
+            style={[styles.categoryButton, activeCategory === 'volunteer' && styles.activeCategoryButton]}
+            onPress={() => setActiveCategory('volunteer')}
+          >
+            <LinearGradient
+              colors={activeCategory === 'volunteer' ? ['#002855', '#003f88'] : ['#f8f9fa', '#f8f9fa']}
+              style={styles.categoryGradient}
+            >
+              <FontAwesome5 name="users" size={16} color={activeCategory === 'volunteer' ? '#fff' : '#002855'} />
+              <Text style={[styles.categoryText, activeCategory === 'volunteer' && styles.activeCategoryText]}>
+                Volunteers
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.categoryButton, activeCategory === 'mentor' && styles.activeCategoryButton]}
+            onPress={() => setActiveCategory('mentor')}
+          >
+            <LinearGradient
+              colors={activeCategory === 'mentor' ? ['#002855', '#003f88'] : ['#f8f9fa', '#f8f9fa']}
+              style={styles.categoryGradient}
+            >
+              <FontAwesome5 name="chalkboard-teacher" size={16} color={activeCategory === 'mentor' ? '#fff' : '#002855'} />
+              <Text style={[styles.categoryText, activeCategory === 'mentor' && styles.activeCategoryText]}>
+                Mentors
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
+        {/* Month Picker for Monthly View */}
+        {activeTab === 'monthly' && (
+          <TouchableOpacity
+            style={styles.monthPickerButton}
+            onPress={() => setMonthPickerVisible(true)}
+          >
+            <LinearGradient
+              colors={['#002855', '#003f88']}
+              style={styles.monthPickerGradient}
+            >
+              <FontAwesome5 name="calendar-alt" size={16} color="#fff" />
+              <Text style={styles.monthPickerText}>
+                {months[selectedMonth]} {selectedYear}
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
+
+        {/* Export Button */}
+        <TouchableOpacity
+          style={styles.exportButton}
+          onPress={exportToCSV}
+        >
+          <LinearGradient
+            colors={['#002855', '#003f88']}
+            style={styles.exportGradient}
+          >
+            <FontAwesome5 name="file-export" size={16} color="#fff" />
+            <Text style={styles.exportText}>Export to CSV</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        {/* Content */}
+        <View style={styles.listContainer}>
+          {renderContent()}
+        </View>
       </View>
 
-      {renderContent()}
-
-      <TouchableOpacity style={styles.exportButton} onPress={exportToCSV}>
-        <Text style={styles.exportButtonText}>
-          Export {activeCategory === 'volunteer' ? 'Volunteers' : 'Mentors'} {activeTab === 'total' ? 'Total' : 'Monthly'} as CSV
-        </Text>
-      </TouchableOpacity>
-      
+      {/* Month Picker Modal */}
       {renderMonthPicker()}
     </View>
   );
@@ -368,218 +410,278 @@ const TotalAttendanceScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: '#f8f9fa',
   },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 16,
-    textAlign: "center",
+  header: {
+    padding: 30,
+    paddingTop: 50,
+    alignItems: 'center',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
-  categoryContainer: {
-    flexDirection: "row",
-    marginBottom: 16,
-    borderRadius: 8,
-    overflow: "hidden",
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 10,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
-  categoryButton: {
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#fff',
+    marginTop: 5,
+    opacity: 0.9,
+  },
+  content: {
     flex: 1,
-    paddingVertical: 12,
-    alignItems: "center",
-    backgroundColor: "#E5E7EB",
+    padding: 15,
+    paddingTop: 25,
   },
-  activeCategoryButton: {
-    backgroundColor: "#3B82F6",
-  },
-  categoryText: {
-    fontWeight: "bold",
-    color: "#4B5563",
-  },
-  activeCategoryText: {
-    color: "white",
+  listContainer: {
+    flex: 1,
+    marginTop: 10,
   },
   tabContainer: {
-    flexDirection: "row",
-    marginBottom: 16,
-    borderRadius: 8,
-    overflow: "hidden",
+    flexDirection: 'row',
+    marginBottom: 20,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 4,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
   },
   tab: {
     flex: 1,
-    paddingVertical: 12,
-    alignItems: "center",
-    backgroundColor: "#E5E7EB",
+    borderRadius: 12,
+    overflow: 'hidden',
   },
   activeTab: {
-    backgroundColor: "#009688",
+    backgroundColor: '#002855',
+  },
+  tabGradient: {
+    padding: 12,
+    alignItems: 'center',
   },
   tabText: {
-    fontWeight: "bold",
-    color: "#4B5563",
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#002855',
   },
   activeTabText: {
-    color: "white",
+    color: '#fff',
   },
-  monthSelector: {
-    backgroundColor: "white",
+  categoryContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+    gap: 12,
+  },
+  categoryButton: {
+    flex: 1,
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+  },
+  activeCategoryButton: {
+    backgroundColor: '#002855',
+  },
+  categoryGradient: {
     padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
-  monthSelectorText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#4B5563",
+  categoryText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#002855',
   },
-  tableHeader: {
-    flexDirection: "row",
-    backgroundColor: "#D1D5DB",
-    paddingVertical: 10,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
+  activeCategoryText: {
+    color: '#fff',
+  },
+  monthPickerButton: {
+    marginBottom: 20,
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+  },
+  monthPickerGradient: {
+    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  monthPickerText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  exportButton: {
+    marginBottom: 20,
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+  },
+  exportGradient: {
+    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  exportText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
   },
   row: {
-    flexDirection: "row",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderColor: "#E5E7EB",
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
   },
   cell: {
     flex: 1,
-    textAlign: "center",
-    fontSize: 11,
-  },
-  headerCell: {
-    fontWeight: "bold",
-    fontSize: 12,
-  },
-  exportButton: {
-    marginTop: 20,
-    padding: 12,
-    backgroundColor: "#009688",
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  exportButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  emptyState: {
-    padding: 32,
-    alignItems: "center",
-  },
-  emptyStateText: {
-    color: "#6B7280",
-    textAlign: "center",
-  },
-  errorContainer: {
-    padding: 32,
-    alignItems: "center",
-  },
-  errorText: {
-    color: "#EF4444",
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  retryButton: {
-    backgroundColor: "#3B82F6",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: "white",
-    fontWeight: "bold",
+    fontSize: 14,
+    color: '#2c3e50',
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modalContent: {
-    width: "80%",
-    backgroundColor: "white",
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    width: '90%',
+    maxWidth: 400,
     elevation: 5,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 16,
-    color: "#1F2937",
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#002855',
+    marginBottom: 20,
+    textAlign: 'center',
   },
   pickerContainer: {
-    flexDirection: "row",
-    marginBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
   },
   pickerColumn: {
     flex: 1,
-    marginHorizontal: 4,
+    marginHorizontal: 10,
   },
   pickerLabel: {
-    textAlign: "center",
-    marginBottom: 8,
-    fontWeight: "bold",
-    color: "#4B5563",
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#002855',
+    marginBottom: 10,
   },
   pickerScrollView: {
-    height: 160,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 8,
+    maxHeight: 200,
   },
   pickerItem: {
     padding: 12,
-    alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
+    borderRadius: 8,
+    marginBottom: 4,
   },
   pickerItemSelected: {
-    backgroundColor: "#E6F7F5",
+    backgroundColor: '#002855',
   },
   pickerItemText: {
-    color: "#4B5563",
+    fontSize: 14,
+    color: '#2c3e50',
   },
   pickerItemTextSelected: {
-    fontWeight: "bold",
-    color: "#009688",
+    color: '#fff',
+    fontWeight: '600',
   },
   modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
   },
   modalButton: {
     flex: 1,
     padding: 12,
     borderRadius: 8,
-    alignItems: "center",
-    marginHorizontal: 4,
+    marginHorizontal: 5,
   },
   cancelButton: {
-    backgroundColor: "#F3F4F6",
-  },
-  cancelButtonText: {
-    color: "#4B5563",
-    fontWeight: "bold",
+    backgroundColor: '#f8f9fa',
   },
   confirmButton: {
-    backgroundColor: "#009688",
+    backgroundColor: '#002855',
+  },
+  cancelButtonText: {
+    color: '#002855',
+    textAlign: 'center',
+    fontWeight: '600',
   },
   confirmButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  }
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  errorContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  errorText: {
+    color: '#dc3545',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  retryButton: {
+    backgroundColor: '#002855',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  emptyState: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    color: '#6c757d',
+    textAlign: 'center',
+  },
 });
 
 export default TotalAttendanceScreen;

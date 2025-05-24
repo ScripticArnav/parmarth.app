@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   StyleSheet,
   Alert,
   ScrollView,
@@ -12,6 +11,8 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import * as DocumentPicker from "expo-document-picker";
+import { LinearGradient } from 'expo-linear-gradient';
+import { FontAwesome5 } from '@expo/vector-icons';
 import backendUrl from "../../backendUrl";
 
 export default function StudyUploadScreen() {
@@ -125,150 +126,288 @@ export default function StudyUploadScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>📚 Upload Study Material</Text>
-
-      <Text style={styles.label}>Class / Exam</Text>
-      <View style={styles.pickerWrapper}>
-        <Picker selectedValue={classOrExam} onValueChange={setClassOrExam}>
-          <Picker.Item label="Select Class or Exam" value="" />
-          {classOptions.map((cls) => (
-            <Picker.Item label={`Class ${cls}`} value={`Class ${cls}`} key={cls} />
-          ))}
-          {examOptions.map((exam) => (
-            <Picker.Item label={exam} value={exam} key={exam} />
-          ))}
-        </Picker>
-      </View>
-
-      <Text style={styles.label}>Subject</Text>
-      <View style={styles.pickerWrapper}>
-        <Picker selectedValue={subject} onValueChange={setSubject}>
-          <Picker.Item label="Select Subject" value="" />
-          {subjects.map((sbj) => (
-            <Picker.Item label={sbj} value={sbj} key={sbj} />
-          ))}
-        </Picker>
-      </View>
-
-      <Text style={styles.label}>Title</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="e.g. Light Chapter Notes"
-        value={title}
-        onChangeText={setTitle}
-      />
-
-      <Text style={styles.label}>Type</Text>
-      <View style={styles.pickerWrapper}>
-        <Picker selectedValue={type} onValueChange={setType}>
-          <Picker.Item label="PDF" value="pdf" />
-        </Picker>
-      </View>
-
-      <TouchableOpacity
-        style={styles.fileBtn}
-        onPress={pickDocument}
-        disabled={picking}
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <LinearGradient
+        colors={['#002855', '#003f88']}
+        style={styles.header}
       >
-        <Text style={styles.fileBtnText}>
-          {file ? `📄 ${file.name}` : "📁 Pick File"}
-        </Text>
-      </TouchableOpacity>
+        <FontAwesome5 name="book" size={40} color="#fff" />
+        <Text style={styles.headerTitle}>Upload Study Material</Text>
+        <Text style={styles.headerSubtitle}>Share educational resources</Text>
+      </LinearGradient>
 
-      {file && (
-        <View style={styles.previewBox}>
-          <Text style={styles.previewText}>✅ File Selected</Text>
-          <Text>Name: {file.name}</Text>
-          <Text>Type: {file.mimeType || "Unknown"}</Text>
-          <Text>Size: {(file.size / 1024).toFixed(2)} KB</Text>
+      <View style={styles.content}>
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionIconContainer}>
+              <FontAwesome5 name="graduation-cap" size={20} color="#002855" />
+            </View>
+            <Text style={styles.sectionTitle}>Material Details</Text>
+          </View>
+
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={classOrExam}
+              onValueChange={setClassOrExam}
+              style={styles.picker}
+            >
+              <Picker.Item label="Select Class or Exam" value="" />
+              {classOptions.map((cls) => (
+                <Picker.Item label={`Class ${cls}`} value={`Class ${cls}`} key={cls} />
+              ))}
+              {examOptions.map((exam) => (
+                <Picker.Item label={exam} value={exam} key={exam} />
+              ))}
+            </Picker>
+          </View>
+
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={subject}
+              onValueChange={setSubject}
+              style={styles.picker}
+            >
+              <Picker.Item label="Select Subject" value="" />
+              {subjects.map((sbj) => (
+                <Picker.Item label={sbj} value={sbj} key={sbj} />
+              ))}
+            </Picker>
+          </View>
+
+          <TextInput
+            style={styles.input}
+            placeholder="e.g. Light Chapter Notes"
+            value={title}
+            onChangeText={setTitle}
+            placeholderTextColor="#6c757d"
+          />
+
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={type}
+              onValueChange={setType}
+              style={styles.picker}
+            >
+              <Picker.Item label="PDF" value="pdf" />
+            </Picker>
+          </View>
         </View>
-      )}
 
-      <TouchableOpacity
-        style={[styles.uploadBtn, loading && { opacity: 0.6 }]}
-        onPress={handleUpload}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.uploadBtnText}>⬆️ Upload Material</Text>
-        )}
-      </TouchableOpacity>
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionIconContainer}>
+              <FontAwesome5 name="file-alt" size={20} color="#002855" />
+            </View>
+            <Text style={styles.sectionTitle}>Upload File</Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={pickDocument}
+            disabled={picking}
+          >
+            <LinearGradient
+              colors={['#002855', '#003f88']}
+              style={styles.buttonGradient}
+            >
+              <FontAwesome5 name="file-upload" size={16} color="#fff" />
+              <Text style={styles.buttonText}>
+                {file ? file.name : "Pick File"}
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {file && (
+            <View style={styles.filePreview}>
+              <View style={styles.fileInfo}>
+                <FontAwesome5 name="file-pdf" size={24} color="#002855" />
+                <View style={styles.fileDetails}>
+                  <Text style={styles.fileName}>{file.name}</Text>
+                  <Text style={styles.fileMeta}>
+                    {file.mimeType || "Unknown"} • {(file.size / 1024).toFixed(2)} KB
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                style={styles.removeFileButton}
+                onPress={() => setFile(null)}
+              >
+                <FontAwesome5 name="times" size={16} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
+        <TouchableOpacity
+          style={styles.submitButton}
+          onPress={handleUpload}
+          disabled={loading}
+        >
+          <LinearGradient
+            colors={['#002855', '#003f88']}
+            style={styles.buttonGradient}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <>
+                <FontAwesome5 name="cloud-upload-alt" size={16} color="#fff" />
+                <Text style={styles.buttonText}>Upload Material</Text>
+              </>
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    paddingBottom: 40,
-    backgroundColor: "#FAFAFA",
+    flex: 1,
+    backgroundColor: '#f8f9fa',
   },
   header: {
-    fontSize: 26,
-    fontWeight: "bold",
-    color: "#4A148C",
-    textAlign: "center",
-    marginBottom: 30,
+    padding: 30,
+    paddingTop: 50,
+    alignItems: 'center',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 6,
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
     marginTop: 10,
-    color: "#333",
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#fff',
+    marginTop: 5,
+    opacity: 0.9,
+  },
+  content: {
+    padding: 15,
+    paddingTop: 25,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f8f9fa',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#002855',
   },
   input: {
+    backgroundColor: '#f8f9fa',
     borderWidth: 1,
-    borderColor: "#B39DDB",
-    backgroundColor: "#fff",
+    borderColor: '#e9ecef',
+    borderRadius: 12,
     padding: 12,
-    borderRadius: 10,
-    fontSize: 16,
-    marginBottom: 15,
+    marginBottom: 12,
+    fontSize: 14,
+    color: '#2c3e50',
   },
-  pickerWrapper: {
+  pickerContainer: {
+    backgroundColor: '#f8f9fa',
     borderWidth: 1,
-    borderColor: "#B39DDB",
-    borderRadius: 10,
-    marginBottom: 15,
-    backgroundColor: "#fff",
-    overflow: "hidden",
+    borderColor: '#e9ecef',
+    borderRadius: 12,
+    marginBottom: 12,
+    overflow: 'hidden',
   },
-  fileBtn: {
-    backgroundColor: "#7E57C2",
-    padding: 12,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 10,
+  picker: {
+    height: 50,
+    color: '#2c3e50',
   },
-  fileBtnText: {
-    color: "#fff",
-    fontWeight: "600",
+  addButton: {
+    marginBottom: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+  },
+  buttonGradient: {
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  buttonText: {
+    color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
   },
-  uploadBtn: {
-    backgroundColor: "#4A148C",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 30,
+  filePreview: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
   },
-  uploadBtnText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 16,
+  fileInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
-  previewBox: {
-    backgroundColor: "#EDE7F6",
-    padding: 14,
-    borderRadius: 10,
-    marginTop: 20,
+  fileDetails: {
+    marginLeft: 12,
+    flex: 1,
   },
-  previewText: {
-    fontWeight: "700",
-    marginBottom: 6,
+  fileName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 4,
+  },
+  fileMeta: {
+    fontSize: 12,
+    color: '#6c757d',
+  },
+  removeFileButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#dc3545',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 12,
+  },
+  submitButton: {
+    marginBottom: 50,
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
   },
 });
