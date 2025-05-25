@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,8 +11,51 @@ import {
 import { Image } from "react-native";
 import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
+import backendUrl from '../../backendUrl';
+import { useFocusEffect } from '@react-navigation/native';
 
 const { width } = Dimensions.get("window");
+
+// Add date formatting function
+const formatUpdateTime = (dateString) => {
+  try {
+    // If no date is provided, return a default message
+    if (!dateString) {
+      return 'Recently added';
+    }
+
+    // First try parsing the date string
+    let updateDate;
+    if (typeof dateString === 'string') {
+      updateDate = new Date(dateString);
+    } else if (dateString && dateString.$date) {
+      // Handle MongoDB date format
+      updateDate = new Date(dateString.$date);
+    } else {
+      return 'Recently added';
+    }
+
+    // Check if date is valid
+    if (isNaN(updateDate.getTime())) {
+      return 'Recently added';
+    }
+
+    // Format the date in Indian format
+    const day = updateDate.getDate();
+    const month = updateDate.toLocaleString('en-IN', { month: 'short' });
+    const year = updateDate.getFullYear();
+    const hours = updateDate.getHours();
+    const minutes = updateDate.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12;
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+
+    return `${day} ${month} ${year}, ${formattedHours}:${formattedMinutes} ${ampm}`;
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Recently added';
+  }
+};
 
 // Counter Component with animation
 const Counter = ({ end, duration = 1000 }) => {
@@ -80,6 +123,43 @@ const MenuItem = ({ icon, label, onPress }) => (
 );
 
 const HomeScreen = () => {
+  const [liveUpdates, setLiveUpdates] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchLiveUpdates = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/live-updates/`);
+      const data = await response.json();
+      if (response.ok) {
+        setLiveUpdates(data.updates);
+      }
+    } catch (error) {
+      console.error('Error fetching updates:', error);
+      // Silently handle error and set default update
+      setLiveUpdates([{
+        _id: 'default',
+        text: 'Welcome to Parmarth! Stay tuned for updates.'
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Add focus effect to refresh data when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchLiveUpdates();
+      return () => {
+        // Cleanup if needed
+      };
+    }, [])
+  );
+
+  // Initial load
+  useEffect(() => {
+    fetchLiveUpdates();
+  }, []);
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Modern Header */}
@@ -87,17 +167,17 @@ const HomeScreen = () => {
         colors={['#002855', '#003f88']}
         style={styles.header}
       >
-        <Image
+        {/* <Image
           source={require("../../assets/icon.png")}
           style={styles.logo}
           resizeMode="contain"
-        />
+        /> */}
         <Text style={styles.title}>PARMARTH</Text>
         <Text style={styles.subtitle}>The Social Club of IET Lucknow</Text>
       </LinearGradient>
 
       {/* Blood Donation Box */}
-      <View style={styles.bannerBox}>
+      {/* <View style={styles.bannerBox}>
         <LinearGradient
           colors={['#ff4b4b', '#ff6b6b']}
           style={styles.bannerGradient}
@@ -110,23 +190,48 @@ const HomeScreen = () => {
             <FontAwesome5 name="heartbeat" size={32} color="#fff" />
           </View>
         </LinearGradient>
-      </View>
+      </View> */}
 
       {/* Menu Options */}
-      <View style={styles.menuContainer}>
+      {/* <View style={styles.menuContainer}>
         <MenuItem icon="calendar" label="Events" />
         <MenuItem icon="handshake" label="Volunteer" />
         <MenuItem icon="images" label="Gallery" />
         <MenuItem icon="info-circle" label="About" />
-      </View>
+      </View> */}
 
       {/* Live Updates */}
       <View style={styles.sectionContainer}>
-        <Text style={styles.sectionTitle}>LIVE UPDATES</Text>
-        <View style={styles.liveUpdateBox}>
-          <View style={styles.dot} />
-          <Text style={styles.liveText}>New Cleanliness Drive on 25th May</Text>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionTitleContainer}>
+            <FontAwesome5 name="bell" size={20} color="#002855" style={styles.sectionIcon} />
+            <Text style={styles.sectionTitle}>LIVE UPDATES</Text>
+          </View>
+          <View style={styles.updateCount}>
+            <Text style={styles.updateCountText}>{liveUpdates.length} Updates</Text>
+          </View>
         </View>
+        {!isLoading && liveUpdates.length > 0 ? (
+          liveUpdates.map((update, index) => (
+            <View key={update._id || index} style={styles.liveUpdateBox}>
+              <View style={styles.updateContent}>
+                <View style={styles.dot} />
+                <Text style={styles.liveText}>{update.text}</Text>
+              </View>
+              <View style={styles.updateTime}>
+                <FontAwesome5 name="clock" size={12} color="#666" />
+                <Text style={styles.timeText}>{formatUpdateTime(update.createdAt)}</Text>
+              </View>
+            </View>
+          ))
+        ) : (
+          <View style={styles.liveUpdateBox}>
+            <View style={styles.updateContent}>
+              <View style={styles.dot} />
+              <Text style={styles.liveText}>Welcome to Parmarth! Stay tuned for updates.</Text>
+            </View>
+          </View>
+        )}
       </View>
 
       {/* Join Us Button */}
@@ -135,7 +240,7 @@ const HomeScreen = () => {
           colors={['#002855', '#003f88']}
           style={styles.joinButtonGradient}
         >
-          <Text style={styles.joinText}>Join Us</Text>
+          <Text style={styles.joinText}>Contact Us</Text>
         </LinearGradient>
       </TouchableOpacity>
 
@@ -198,15 +303,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   title: {
-    fontSize: 28,
+    fontSize: 70,
     fontWeight: "bold",
     color: "#fff",
     marginTop: 8,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 20,
     color: "#fff",
-    opacity: 0.9,
+    opacity: 1.9,
+    marginBottom: 20,
   },
   bannerBox: {
     margin: 16,
@@ -269,36 +375,95 @@ const styles = StyleSheet.create({
   sectionContainer: {
     marginTop: 24,
     paddingHorizontal: 16,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    marginHorizontal: 16,
+    paddingVertical: 20,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    paddingHorizontal: 8,
+  },
+  sectionTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  sectionIcon: {
+    marginRight: 10,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 22,
+    fontWeight: "700",
     color: "#002855",
-    marginBottom: 12,
+    letterSpacing: 0.5,
+  },
+  updateCount: {
+    backgroundColor: '#f0f4f8',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  updateCountText: {
+    fontSize: 13,
+    color: '#002855',
+    fontWeight: '600',
   },
   liveUpdateBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 12,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 16,
     padding: 16,
+    marginBottom: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4CAF50',
     elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  updateContent: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   dot: {
-    width: 10,
-    height: 10,
-    backgroundColor: "#4CAF50",
-    borderRadius: 5,
+    width: 8,
+    height: 8,
+    backgroundColor: '#4CAF50',
+    borderRadius: 4,
     marginRight: 12,
+    marginTop: 6,
   },
   liveText: {
     fontSize: 15,
-    color: "#333",
+    color: '#333',
     flex: 1,
+    lineHeight: 22,
+    fontWeight: '500',
+  },
+  updateTime: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    marginLeft: 20,
+    backgroundColor: '#fff',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  timeText: {
+    fontSize: 12,
+    color: '#666',
+    marginLeft: 4,
+    fontWeight: '500',
   },
   joinButton: {
     margin: 16,

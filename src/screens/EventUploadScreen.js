@@ -16,7 +16,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import backendUrl from "../../backendUrl";
 
 const events = [
-  "उद्यम",
+  "उद्गम",
   "उम्मीद",
   "उन्नयन",
   "उत्साह",
