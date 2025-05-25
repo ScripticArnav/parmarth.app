@@ -13,6 +13,7 @@ import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
 import backendUrl from '../../backendUrl';
 import { useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get("window");
 
@@ -125,6 +126,7 @@ const MenuItem = ({ icon, label, onPress }) => (
 const HomeScreen = () => {
   const [liveUpdates, setLiveUpdates] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const navigation = useNavigation();
 
   const fetchLiveUpdates = async () => {
     try {
@@ -235,12 +237,15 @@ const HomeScreen = () => {
       </View>
 
       {/* Join Us Button */}
-      <TouchableOpacity style={styles.joinButton}>
+      <TouchableOpacity 
+        style={styles.joinButton}
+        onPress={() => navigation.navigate('Contact')}
+      >
         <LinearGradient
           colors={['#002855', '#003f88']}
           style={styles.joinButtonGradient}
         >
-          <Text style={styles.joinText}>Contact Us</Text>
+          <Text style={styles.joinText}>Connect With Us</Text>
         </LinearGradient>
       </TouchableOpacity>
 
