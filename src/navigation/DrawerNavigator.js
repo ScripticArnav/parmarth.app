@@ -31,6 +31,7 @@ import MentorScreen from "../screens/MentorScreen";
 import TotalAttendanceScreen from "../screens/TotalAttendanceScreen";
 import AuthContext from "../store/AuthContext";
 import backendUrl from "../../backendUrl";
+import LiveUpdateScreen from "../screens/LiveUpdateScreen";
 
 const MemoizedTabs = memo(AppNavigator);
 const Drawer = createDrawerNavigator();
@@ -495,6 +496,19 @@ export default function DrawerNavigator() {
         options={{ 
           headerShown: true,
           drawerItemStyle: { display: (authCtx.loginMethod === "password") ? "flex" : "none" }
+        }}
+      />
+      <Drawer.Screen
+        name="Add Live Updates"
+        component={LiveUpdateScreen}
+        options={{
+          headerShown: true,
+          drawerItemStyle: {
+            display:
+              authCtx.loginMethod === "password"
+                ? "flex"
+                : "none",
+          },
         }}
       />
     </Drawer.Navigator>
