@@ -1,10 +1,9 @@
-// AboutScreen.js
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, Dimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Image, Dimensions, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome5 } from '@expo/vector-icons';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export default function AboutScreen() {
   return (
@@ -144,41 +143,41 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   header: {
-    padding: 30,
-    paddingTop: 50,
+    padding: width * 0.075,
+    paddingTop: Platform.OS === 'ios' ? height * 0.08 : height * 0.06,
     alignItems: 'center',
     justifyContent: 'center',
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: width * 0.075,
+    borderBottomRightRadius: width * 0.075,
   },
   headerContent: {
     alignItems: 'center',
   },
   title: {
-    fontSize: 36,
+    fontSize: Math.min(width * 0.09, 36),
     fontWeight: 'bold',
     color: '#ffffff',
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: height * 0.015,
     textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: Math.min(width * 0.045, 18),
     color: '#ffffff',
-    marginTop: 5,
+    marginTop: height * 0.008,
     opacity: 0.9,
   },
   content: {
-    padding: 15,
-    paddingTop: 25,
+    padding: width * 0.0375,
+    paddingTop: height * 0.03,
   },
   card: {
     backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
+    borderRadius: width * 0.04,
+    padding: width * 0.05,
+    marginBottom: height * 0.02,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -191,110 +190,86 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: height * 0.015,
   },
   cardTitle: {
-    fontSize: 22,
+    fontSize: Math.min(width * 0.055, 22),
     fontWeight: '600',
     color: '#002855',
-    marginLeft: 10,
+    marginLeft: width * 0.025,
   },
   section: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: Math.min(width * 0.04, 16),
+    lineHeight: Math.min(width * 0.06, 24),
     color: '#2c3e50',
-    marginBottom: 10,
   },
   listContainer: {
-    marginTop: 10,
+    marginTop: height * 0.015,
   },
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
-    backgroundColor: '#f8f9fa',
-    padding: 12,
-    borderRadius: 10,
+    marginBottom: height * 0.015,
   },
   listText: {
-    fontSize: 16,
-    lineHeight: 22,
+    fontSize: Math.min(width * 0.035, 14),
     color: '#2c3e50',
-    marginLeft: 10,
+    marginLeft: width * 0.025,
     flex: 1,
   },
   footer: {
-    marginTop: 20,
-    marginBottom: 10,
+    marginBottom: height * 0.05,
   },
   footerGradient: {
-    width: '100%',
-    padding: 16,
+    borderRadius: width * 0.04,
+    overflow: 'hidden',
   },
   footerContent: {
+    padding: width * 0.05,
     alignItems: 'center',
-    paddingTop: 8,
   },
   heartContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
+    marginBottom: height * 0.015,
   },
   heartGradient: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 25,
-    alignItems: 'center',
+    width: Math.min(width * 0.15, 60),
+    height: Math.min(width * 0.15, 60),
+    borderRadius: Math.min(width * 0.075, 30),
     justifyContent: 'center',
+    alignItems: 'center',
   },
   heartIcon: {
-    transform: [{ scale: 1.1 }],
+    marginLeft: width * 0.005,
   },
   credit: {
-    fontSize: 16,
+    fontSize: Math.min(width * 0.035, 14),
     color: '#6c757d',
-    marginBottom: 5,
+    marginBottom: height * 0.005,
   },
   namesContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
-    flexWrap: 'wrap',
-    justifyContent: 'center',
+    marginBottom: height * 0.005,
   },
   names: {
-    fontSize: 22,
-    fontWeight: '900',
+    fontSize: Math.min(width * 0.04, 16),
+    fontWeight: '600',
     color: '#002855',
   },
   andText: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: Math.min(width * 0.035, 14),
     color: '#6c757d',
-    marginHorizontal: 6,
+    marginHorizontal: width * 0.01,
   },
   batchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 6,
-    backgroundColor: '#f8f9fa',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
   },
   batchIcon: {
-    marginRight: 6,
+    marginRight: width * 0.01,
   },
   batch: {
-    fontSize: 14,
+    fontSize: Math.min(width * 0.03, 12),
     color: '#6c757d',
-    fontStyle: 'italic',
   },
 });
