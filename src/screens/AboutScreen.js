@@ -26,7 +26,7 @@ export default function AboutScreen() {
             <Text style={styles.cardTitle}>Our Journey</Text>
           </View>
           <Text style={styles.section}>
-            Parmarth began its journey in 2015 with a mission to transform the lives of underprivileged children through education. 
+            Parmarth began its journey from Sept 6, 2015 with a mission to transform the lives of underprivileged children through education. 
             It started when a few kind-hearted IETians noticed young beggars near the college and decided to offer something more meaningful — hope through learning.
           </Text>
         </View>

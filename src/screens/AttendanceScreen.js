@@ -155,6 +155,13 @@ const AttendanceScreen = () => {
     }
   };
 
+  const handleRemoveVolunteer = (index) => {
+    if (volunteers.length > 1) {
+      const updated = volunteers.filter((_, i) => i !== index);
+      setVolunteers(updated);
+    }
+  };
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <LinearGradient
@@ -175,6 +182,14 @@ const AttendanceScreen = () => {
                 <FontAwesome5 name="user" size={20} color="#002855" />
               </View>
               <Text style={styles.cardTitle}>Volunteer {index + 1}</Text>
+              {index > 0 && (
+                <TouchableOpacity 
+                  style={styles.removeButton}
+                  onPress={() => handleRemoveVolunteer(index)}
+                >
+                  <FontAwesome5 name="times" size={16} color="#dc3545" />
+                </TouchableOpacity>
+              )}
             </View>
 
             <TextInput
@@ -511,6 +526,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#002855',
     padding: 12,
+  },
+  removeButton: {
+    marginLeft: 'auto',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#dc3545',
   },
 });
 

@@ -36,6 +36,13 @@ const MentorScreen = () => {
     setMentors([...mentors, { mentorName: "", rollNo: "", branch: "" }]);
   };
 
+  const handleRemoveMentor = (index) => {
+    if (mentors.length > 1) {
+      const updated = mentors.filter((_, i) => i !== index);
+      setMentors(updated);
+    }
+  };
+
   const handleSubmit = async () => {
     for (let mentor of mentors) {
       if (!mentor.mentorName.trim() || !mentor.rollNo.trim() || !mentor.branch) {
@@ -88,6 +95,14 @@ const MentorScreen = () => {
                 <FontAwesome5 name="user-graduate" size={20} color="#002855" />
               </View>
               <Text style={styles.cardTitle}>Mentor {index + 1}</Text>
+              {index > 0 && (
+                <TouchableOpacity 
+                  style={styles.removeButton}
+                  onPress={() => handleRemoveMentor(index)}
+                >
+                  <FontAwesome5 name="times" size={16} color="#dc3545" />
+                </TouchableOpacity>
+              )}
             </View>
 
             <TextInput
@@ -275,6 +290,17 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  removeButton: {
+    marginLeft: 'auto',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#dc3545',
   },
 });
 
