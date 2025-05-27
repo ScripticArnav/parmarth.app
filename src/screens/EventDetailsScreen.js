@@ -8,11 +8,14 @@ import {
   Dimensions,
   ActivityIndicator,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import ImageViewing from 'react-native-image-viewing';
 import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome5 } from '@expo/vector-icons';
 import backendUrl from '../../backendUrl';
+
+const { width, height } = Dimensions.get('window');
 
 export default function EventDetailsScreen({ route }) {
   const { eventName } = route.params;
@@ -99,58 +102,58 @@ export default function EventDetailsScreen({ route }) {
   );
 }
 
-const screenWidth = Dimensions.get('window').width;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
   },
   header: {
-    padding: 30,
-    paddingTop: 50,
+    padding: width * 0.075,
+    paddingTop: Platform.OS === 'ios' ? height * 0.08 : height * 0.06,
     alignItems: 'center',
     justifyContent: 'center',
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: width * 0.075,
+    borderBottomRightRadius: width * 0.075,
   },
   title: {
-    fontSize: 28,
+    fontSize: Math.min(width * 0.07, 28),
     fontWeight: 'bold',
     color: '#ffffff',
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: height * 0.015,
     textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: Math.min(width * 0.04, 16),
     color: '#ffffff',
-    marginTop: 5,
+    marginTop: height * 0.008,
     opacity: 0.9,
   },
   content: {
-    padding: 15,
-    paddingTop: 25,
+    padding: width * 0.0375,
+    paddingTop: height * 0.03,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: width * 0.05,
+    minHeight: height * 0.3,
   },
   noPhotosContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 30,
+    padding: width * 0.075,
+    minHeight: height * 0.3,
   },
   noPhotosIcon: {
-    marginBottom: 15,
+    marginBottom: height * 0.02,
     opacity: 0.5,
   },
   noPhotos: {
-    fontSize: 16,
+    fontSize: Math.min(width * 0.04, 16),
     color: '#6c757d',
     textAlign: 'center',
   },
@@ -160,9 +163,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   photoContainer: {
-    width: (screenWidth - 48) / 2,
-    marginBottom: 16,
-    borderRadius: 16,
+    width: (width - width * 0.12) / 2,
+    marginBottom: height * 0.02,
+    borderRadius: width * 0.04,
     overflow: 'hidden',
     backgroundColor: '#fff',
     shadowColor: '#000',
@@ -176,7 +179,7 @@ const styles = StyleSheet.create({
   },
   photo: {
     width: '100%',
-    height: 160,
+    height: Math.min(width * 0.4, height * 0.25),
     backgroundColor: '#eee',
   },
 });
