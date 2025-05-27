@@ -272,19 +272,29 @@ const HomeScreen = () => {
 
       {/* Stats Section */}
       <View style={styles.statsSection}>
-        <Text style={styles.statsTitle}>Our Impact</Text>
-        <View style={styles.statsContainer}>
-          {impactData.map((item, index) => (
-            <View key={item.title} style={styles.statCard}>
-              <View style={styles.statIconContainer}>
-                <FontAwesome5 name={item.icon} size={24} color="#002855" />
+        <LinearGradient
+          colors={['#002855', '#003f88', '#0055b3']}
+          style={styles.statsGradient}
+        >
+          <Text style={styles.statsTitle}>Our Impact</Text>
+          <View style={styles.statsContainer}>
+            {impactData.map((item, index) => (
+              <View key={item.title} style={styles.statCard}>
+                <LinearGradient
+                  colors={['#ffffff', '#f8f9fa']}
+                  style={styles.statCardGradient}
+                >
+                  <View style={styles.statIconContainer}>
+                    <FontAwesome5 name={item.icon} size={24} color="#002855" />
+                  </View>
+                  <Counter end={item.count} />
+                  <Text style={styles.statTitle}>{item.title}</Text>
+                  <Text style={styles.statDescription}>{item.description}</Text>
+                </LinearGradient>
               </View>
-              <Counter end={item.count} />
-              <Text style={styles.statTitle}>{item.title}</Text>
-              <Text style={styles.statDescription}>{item.description}</Text>
-            </View>
-          ))}
-        </View>
+            ))}
+          </View>
+        </LinearGradient>
       </View>
     </ScrollView>
   );
@@ -530,12 +540,19 @@ const styles = StyleSheet.create({
     marginTop: 24,
     paddingHorizontal: 16,
     marginBottom: 32,
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  statsGradient: {
+    padding: 20,
+    borderRadius: 20,
   },
   statsTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
-    color: "#002855",
-    marginBottom: 16,
+    color: "#fff",
+    marginBottom: 20,
+    textAlign: 'center',
   },
   statsContainer: {
     flexDirection: "row",
@@ -544,15 +561,18 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: "48%",
-    backgroundColor: "#fff",
     borderRadius: 16,
-    padding: 16,
     marginBottom: 16,
     elevation: 3,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.23,
     shadowRadius: 2.62,
+    overflow: 'hidden',
+  },
+  statCardGradient: {
+    padding: 16,
+    borderRadius: 16,
   },
   statIconContainer: {
     width: 40,

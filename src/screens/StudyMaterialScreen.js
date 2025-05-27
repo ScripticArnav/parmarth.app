@@ -5,7 +5,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 
 export default function StudyMaterialScreen({ navigation }) {
   const classes = ['GE', 'KG', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'];
-  const exams = ['JEE', 'NEET'];
+  const exams = ['JEE', 'NEET' , 'JNV-6' , 'JNV-9' , 'SHRESTHA' , 'CUET'];
 
   const renderButton = (title, type) => (
     <TouchableOpacity
