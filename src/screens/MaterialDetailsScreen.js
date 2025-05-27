@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,12 @@ import {
   ActivityIndicator,
   Modal,
   Linking,
+  BackHandler,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import backendUrl from '../../backendUrl';
 
 export default function MaterialDetailsScreen({ route }) {
@@ -20,6 +22,8 @@ export default function MaterialDetailsScreen({ route }) {
   const [loading, setLoading] = useState(true);
   const [webViewVisible, setWebViewVisible] = useState(false);
   const [currentUrl, setCurrentUrl] = useState('');
+  const webViewRef = useRef(null);
+  const [canGoBack, setCanGoBack] = useState(false);
 
   const subjects = [
     'HomeWork',
@@ -59,6 +63,24 @@ export default function MaterialDetailsScreen({ route }) {
 
     fetchMaterials();
   }, [className]);
+
+  // Handle hardware back button
+  useEffect(() => {
+    const backAction = () => {
+      if (webViewVisible) {
+        setWebViewVisible(false);
+        return true;
+      }
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [webViewVisible]);
 
   const getMaterialsForSubject = (subject) => {
     return materials.filter(
@@ -140,7 +162,11 @@ export default function MaterialDetailsScreen({ route }) {
       </ScrollView>
 
       {/* WebView Modal */}
-      <Modal visible={webViewVisible} animationType="slide">
+      <Modal 
+        visible={webViewVisible} 
+        animationType="slide"
+        onRequestClose={() => setWebViewVisible(false)}
+      >
         <View style={styles.modalContainer}>
           <LinearGradient
             colors={['#002855', '#003f88']}
@@ -164,6 +190,7 @@ export default function MaterialDetailsScreen({ route }) {
           </LinearGradient>
 
           <WebView
+            ref={webViewRef}
             source={{
               uri: `https://docs.google.com/viewer?url=${encodeURIComponent(currentUrl)}&embedded=true`,
             }}
@@ -177,6 +204,9 @@ export default function MaterialDetailsScreen({ route }) {
             zoomable={true}
             allowsFullscreenVideo={true}
             allowsInlineMediaPlayback={true}
+            onNavigationStateChange={(navState) => {
+              setCanGoBack(navState.canGoBack);
+            }}
             userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
             injectedJavaScript={`
               // Set document properties
