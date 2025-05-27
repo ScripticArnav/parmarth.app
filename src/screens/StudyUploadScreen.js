@@ -32,7 +32,7 @@ export default function StudyUploadScreen() {
     "11th",
     "12th",
   ];
-  const examOptions = ["JEE", "NEET"];
+  const examOptions = ["JEE", "NEET", 'JNV-6' , 'JNV-9' , 'SHRESTHA' , 'CUET'];
   const subjects = [
     "HomeWork",
     "Hindi",

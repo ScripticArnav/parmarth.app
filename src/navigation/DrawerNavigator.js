@@ -3,6 +3,7 @@ import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItemList,
+  useDrawerStatus,
 } from "@react-navigation/drawer";
 import {
   View,
@@ -38,6 +39,7 @@ const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = (props) => {
   const authCtx = useContext(AuthContext);
+  const drawerStatus = useDrawerStatus();
   const [showPasswordLogin, setShowPasswordLogin] = useState(false);
   const [showOtpLogin, setShowOtpLogin] = useState(false);
   const [name, setName] = useState("");
@@ -47,7 +49,20 @@ const CustomDrawerContent = (props) => {
   const [otpSent, setOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Reset all states when auth state changes
+  // Reset states when drawer closes or auth state changes
+  useEffect(() => {
+    if (drawerStatus === 'closed' && !authCtx.isLoggedIn) {
+      setShowPasswordLogin(false);
+      setShowOtpLogin(false);
+      setOtpSent(false);
+      setOtp("");
+      setName("");
+      setEmail("");
+      setPassword("");
+    }
+  }, [drawerStatus, authCtx.isLoggedIn]);
+
+  // Reset states when auth state changes
   useEffect(() => {
     if (!authCtx.isLoggedIn) {
       setShowPasswordLogin(false);
@@ -410,6 +425,9 @@ export default function DrawerNavigator() {
         drawerStyle: styles.drawerStyle,
         sceneContainerStyle: { backgroundColor: "transparent" },
         headerShown: false,
+        drawerPosition: "left",
+        swipeEnabled: true,
+        swipeEdgeWidth: 50,
         headerRight: () => (
           <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 16 }}>
             <Image
