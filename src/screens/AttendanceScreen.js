@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import backendUrl from "../../backendUrl";
 import {
   View,
@@ -16,13 +16,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome5 } from '@expo/vector-icons';
 
 const AttendanceScreen = () => {
-  const [volunteers, setVolunteers] = useState([
-    { volName: "", rollNo: "", branch: "" },
-  ]);
-
-  const [classWise, setClassWise] = useState([{ className: "", count: "" }]);
-  const [photos, setPhotos] = useState([]);
-
   const classGroups = [
     "group 0-",
     "group 0+",
@@ -32,6 +25,15 @@ const AttendanceScreen = () => {
     "group JNV",
     "group GE",
   ];
+
+  const [volunteers, setVolunteers] = useState([
+    { volName: "", rollNo: "", branch: "" },
+  ]);
+
+  const [classWise, setClassWise] = useState(
+    classGroups.map(group => ({ className: group, count: "" }))
+  );
+  const [photos, setPhotos] = useState([]);
 
   const branches = [
     "CSE",
@@ -128,17 +130,28 @@ const AttendanceScreen = () => {
         body: formData,
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error('JSON Parse Error:', jsonError);
+        const text = await response.text();
+        console.error('Server Response:', text);
+        throw new Error("Invalid response from server");
+      }
       
       if (!response.ok) throw new Error(data.message || "Submission failed");
 
       Alert.alert("Success", data.message || "Attendance marked!");
       setVolunteers([{ volName: "", rollNo: "", branch: "" }]);
-      setClassWise([{ className: "", count: "" }]);
+      setClassWise(classGroups.map(group => ({ className: group, count: "" })));
       setPhotos([]);
     } catch (error) {
       console.error('Error details:', error);
-      Alert.alert("Error", error.message || "Network request failed. Please check your connection and try again.");
+      Alert.alert(
+        "Error", 
+        error.message || "Network request failed. Please check your connection and try again."
+      );
     }
   };
 
@@ -230,66 +243,27 @@ const AttendanceScreen = () => {
             <Text style={styles.sectionTitle}>Class-wise Attendance</Text>
           </View>
 
-          {classWise.map((item, index) => {
-            const availableClasses = getAvailableClasses(index);
-            if (item.className && !availableClasses.includes(item.className)) {
-              availableClasses.push(item.className);
-            }
-            availableClasses.sort();
-
-            return (
-              <View key={index} style={styles.classCard}>
-                <View style={styles.classRow}>
-                  <View style={[styles.pickerContainer, { flex: 1, marginRight: 8 }]}>
-                    <Picker
-                      selectedValue={item.className}
-                      onValueChange={(value) => {
-                        const updated = [...classWise];
-                        updated[index].className = value;
-                        setClassWise(updated);
-                      }}
-                      style={styles.picker}
-                    >
-                      <Picker.Item
-                        label="Select Class Group"
-                        value=""
-                        enabled={false}
-                      />
-                      {availableClasses.map((group) => (
-                        <Picker.Item key={group} label={group} value={group} />
-                      ))}
-                    </Picker>
-                  </View>
-                  <TextInput
-                    placeholder="Count"
-                    value={item.count}
-                    keyboardType="numeric"
-                    onChangeText={(text) => {
-                      const updated = [...classWise];
-                      updated[index].count = text;
-                      setClassWise(updated);
-                    }}
-                    style={[styles.input, { flex: 1 }]}
-                    placeholderTextColor="#6c757d"
-                  />
+          {classWise.map((item, index) => (
+            <View key={index} style={styles.classCard}>
+              <View style={styles.classRow}>
+                <View style={[styles.pickerContainer, { flex: 1, marginRight: 8 }]}>
+                  <Text style={styles.className}>{item.className}</Text>
                 </View>
+                <TextInput
+                  placeholder="Count"
+                  value={item.count}
+                  keyboardType="numeric"
+                  onChangeText={(text) => {
+                    const updated = [...classWise];
+                    updated[index].count = text;
+                    setClassWise(updated);
+                  }}
+                  style={[styles.input, { flex: 1 }]}
+                  placeholderTextColor="#6c757d"
+                />
               </View>
-            );
-          })}
-
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={handleAddClass}
-            disabled={getAvailableClasses().length === 0}
-          >
-            <LinearGradient
-              colors={getAvailableClasses().length === 0 ? ['#6c757d', '#6c757d'] : ['#002855', '#003f88']}
-              style={styles.buttonGradient}
-            >
-              <FontAwesome5 name="plus" size={16} color="#fff" />
-              <Text style={styles.buttonText}>Add Class</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+            </View>
+          ))}
         </View>
 
         {/* Photos Section */}
@@ -531,6 +505,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
+  },
+  className: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#002855',
+    padding: 12,
   },
 });
 

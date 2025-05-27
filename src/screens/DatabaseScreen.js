@@ -1,13 +1,10 @@
-import React, { useContext } from "react";
+import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, StatusBar, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import AuthContext from "../store/AuthContext";
 import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome5 } from '@expo/vector-icons';
 
 const DatabaseScreen = () => {
-  const authCtx = useContext(AuthContext);
-  const isLoggedIn = authCtx.isLoggedIn;
   const navigation = useNavigation();
 
   const handleNavigation = (screenName) => {
